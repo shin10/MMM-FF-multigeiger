@@ -1,0 +1,17 @@
+{
+	"current": "current",
+	"day": "today",
+	"week": "7 days",
+	"month": "30 days",
+	"SENSOR_ID": "Sensor: #",
+	"SENSOR_CPM": "CPM",
+	"SENSOR_USVT": "µSv",
+	"SENSOR_INDOOR": "indoor",
+	"SENSOR_OUTDOOR": "outdoor",
+	"SENSOR_ICON_INDOOR": "fa-solid fa-house",
+	"SENSOR_ICON_OUTDOOR": "fa-solid fa-tree-city",
+	"SENSOR_ICON_RADIATION": "fa-solid fa-circle-radiation",
+	"SENSOR_ICON_DISABLED": "fa-solid fa-xmark",
+	"SENSOR_ICON_SIGNAL": "fa-solid fa-signal",
+	"SENSOR_ICON_NO_SIGNAL": "fa-solid fa-link-slash"
+}

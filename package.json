@@ -1,0 +1,32 @@
+{
+  "name": "magic-mirror-module-ff-multigeiger",
+  "version": "1.0.0",
+  "description": "Module for Magic Mirror 2 featuring radiation data collected by the https://ecocurious.de/projekte/multigeiger-2/ project and accessed via https://multigeiger.citysensor.de/",
+  "main": "MMM-FF-multigeiger.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shin10/MMM-FFmultigeiger.git"
+  },
+  "keywords": [
+    "Magic Mirror Module",
+    "smart mirror",
+    "radiation",
+    "multigeiger"
+  ],
+  "author": "Michael Trenkler",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shin10/MMM-FFmultigeiger/issues"
+  },
+  "homepage": "https://github.com/shin10/MMM-FFmultigeiger#readme",
+  "dependencies": {
+    "axios": "^0.26.0",
+    "cheerio": "^1.0.0-rc.10",
+    "d3": "^7.4.4"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-sass": "^5.1.0",
+    "sass": "^1.51.0"
+  }
+}

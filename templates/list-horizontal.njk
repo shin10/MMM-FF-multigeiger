@@ -1,0 +1,89 @@
+<div class="list-horizontal">
+  {% if title %}
+    <span class="thin dimmed medium">{{ title }}</span>
+  {% endif %}
+  {% if dataComplete %}
+    <ul class="sensorlist">
+      {% for sensor in sensors %}
+        <li class="sensorlist-item {{ sensor.avg.statusString }}" data-sensor="{{ sensor.id }}">
+          <span class="sensorlist-name">{{ sensor.avg.name }}
+            <i class="sensorlist-icon-indoor dimmed {{ ['SENSOR_ICON_OUTDOOR', 'SENSOR_ICON_INDOOR'][sensor.avg.indoor] | translate |
+              safe }}"></i>
+          </span>
+          <span class="sensorlist-current">
+            <span class="sensorlist-current-cpm show" style="animation-delay: {{ loop.index0 * 125 }}ms">
+              <span class="sensorlist-minmax">
+                {% if sensor.minVals %}
+                  <span class="sensorlist-min">{{ sensor.minVals.cpmAvg.toFixed(1) }}
+                  </span>
+                  {# <span class="sensorlist-mid">{{ sensor.avg48Vals.cpmAvg.toFixed(1) }}
+                                                                    </span> #}
+                  <span class="sensorlist-max">{{ sensor.maxVals.cpmAvg.toFixed(1) }}
+                  </span>
+                {% endif %}
+              </span>
+              <span class="current-value">
+                {% if sensor.avg.statusString === "ok" %}
+                  <span class="value-cpm">{{ sensor.latestVals.cpmAvg.toFixed(1) }}</span>
+                {% else %}
+                  <i class="sensorlist-icon-status {{ ['SENSOR_ICON_DISABLED', 'SENSOR_ICON_NO_SIGNAL',
+                    'SENSOR_ICON_SIGNAL'][sensor.avg.status] | translate | safe }}"></i>
+                {% endif %}
+              </span>
+              <span class="current-label dimmed">
+                <span class="label-cpm">{{ "SENSOR_CPM" | translate | safe }}</span>
+              </span>
+            </span>
+            <span class="sensorlist-current-svt" style="animation-delay: {{ loop.index0 * 125 }}ms">
+              <span class="sensorlist-minmax">
+                {% if sensor.minVals %}
+                  <span class="sensorlist-min">{{ sensor.minVals.uSvphAvg.toFixed(3) }}
+                  </span>
+                  {# <span class="sensorlist-mid">{{ sensor.avg48Vals.uSvphAvg.toFixed(3) }}
+                                                                    </span> #}
+                  <span class="sensorlist-max">{{ sensor.maxVals.uSvphAvg.toFixed(3) }}
+                  </span>
+                {% endif %}
+              </span>
+              <span class="current-value">
+                {% if sensor.avg.statusString === "ok" %}
+                  <span class="value-svt">{{ sensor.latestVals.uSvphAvg.toFixed(2) }}</span>
+                {% else %}
+                  <i class="sensorlist-icon-status {{ ['SENSOR_ICON_DISABLED', 'SENSOR_ICON_NO_SIGNAL',
+                    'SENSOR_ICON_SIGNAL'][sensor.avg.status] | translate | safe }}"></i>
+                {% endif %}
+              </span>
+              <span class="current-label dimmed">
+                <span class="label-svt">{{ "SENSOR_USVT" | translate | safe }}</span>
+              </span>
+            </span>
+          </span>
+          {# <span class="sensorlist-lastseen">{{ sensor.properties.values[0].lastSeen | replace(r/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}).*/, "$1 $2") }}</span> #}
+          <span class="sensorlist-description">{{ sensor.description }}</span>
+          <span class="sensorlist-id">{{ "SENSOR_ID" | translate | safe }}{{ sensor.id }}</span>
+          <span class="sensorlist-type">{{ sensor.properties.values[0].typ }}</span>
+          <span class="sensorlist-indoor">
+            {{ ["SENSOR_OUTDOOR", "SENSOR_INDOOR"][sensor.indoor] | translate | safe }}
+          </span>
+          <span class="sensorlist-address">
+            <span class="sensorlist-address-line">
+              <span class="sensorlist-street">{{ sensor.properties.values[0].address.street }}</span>&nbsp;
+              <span class="sensorlist-streetnumber">{{ sensor.properties.values[0].address.number }}</span>
+            </span>
+            <span class="sensorlist-address-line">
+              <span class="sensorlist-zip">{{ sensor.properties.values[0].address.plz }}</span>&nbsp;
+              <span class="sensorlist-city">{{ sensor.properties.values[0].address.city }}</span>
+            </span>
+          </span>
+          <span class="sensorlist-region">{{ sensor.properties.values[0].address.region }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <span class="loading">loading current sensor data &hellip;
+      <span class="loading-spinner">
+        <i class="loading-spinner-icon fa-solid fa-radiation"></i>
+      </span>
+    </span>
+  {% endif %}
+</div>
