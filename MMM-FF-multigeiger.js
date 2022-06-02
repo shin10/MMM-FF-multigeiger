@@ -115,10 +115,6 @@ Module.register("MMM-FF-multigeiger", {
       sensor.avg48Vals = this.avg48Vals[sensor.id];
       sensor.latestVals = this.latestVals[sensor.id];
 
-      // dataComplete =
-      //   dataComplete &&
-      //   (sensor.chartData?.day?.radiation?.values.length ?? false);
-
       return sensor;
     });
     dataComplete = dataComplete && sensors?.length;
@@ -237,12 +233,12 @@ Module.register("MMM-FF-multigeiger", {
       const min = d3.min(
         sensors
           .map((sensor) => this.chartData.day[sensor.id])
-          .map((_) => d3.min(_.radiation.values, (_) => _.uSvphAvg))
+          .map((_) => d3.min(_?.radiation.values, (_) => _.uSvphAvg))
       );
       const max = d3.max(
         sensors
           .map((sensor) => this.chartData.day[sensor.id])
-          .map((_) => d3.max(_.radiation.values, (_) => _.uSvphAvg))
+          .map((_) => d3.max(_?.radiation.values, (_) => _.uSvphAvg))
       );
 
       sensors.forEach((sensor) => {
