@@ -1,10 +1,11 @@
 ![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.gif)
 
-# MMM-FF-multigeiger
+# MMM-FF-multigeiger (BETA)
 
 [![ISC License](https://img.shields.io/badge/license-ISC-blue.svg)](https://choosealicense.com/licenses/isc)
 
-A module for [MagicMirror²](https://github.com/MichMich/MagicMirror) showing radiation charts from[https://multigeiger.citysensor.de](https://multigeiger.citysensor.de/).
+A module for [MagicMirror²](https://github.com/MichMich/MagicMirror) showing radiation charts from [https://multigeiger.citysensor.de](https://multigeiger.citysensor.de/).
+Want to help us? [Join the project and build your own Geiger-Müller counter!](https://ecocurious.de/projekte/multigeiger-2/)
 
 Features:
 
@@ -39,6 +40,13 @@ $(
   disabled: false,
   config: {
     layout: "list-horizontal",
+    style: "default", // or "monochrome", "color", ["#f00", "#0f0", "#00f" ...]
+    sequence: "default", // null, 'random', 'default', 'reverse'
+    updateOnSuspension: null, // null, false or true
+    updateInterval: 5 * 60 * 1000, // 5 minutes
+    showTitle: true,
+    animationSpeed: 1000,
+    toggleUnitInterval: 10 * 1000,
     sensorList: [
       {
         description: "Current Radiation",
@@ -68,39 +76,31 @@ $(
         ],
       },
     ],
+    events: {
+      SENSOR_LIST_ITEM_PREVIOUS: "SENSOR_LIST_ITEM_PREVIOUS",
+      SENSOR_LIST_ITEM_NEXT: "SENSOR_LIST_ITEM_NEXT",
+      SENSOR_LIST_ITEM_RANDOM: "SENSOR_LIST_ITEM_RANDOM"
+    }
   },
 },
 ```
 
 ### Configuration Options
 
-| **Option**           | **Type**         | **Default**                            | **Description**                                                                                                                                                                 |
-| -------------------- | ---------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `header`             | `string`         | `"Multigeiger"`                        | Basically that. Doesn't have to be changed unless you're self-hosting.                                                                                                          |
-| `baseURL`            | `string`         | `"https://multigeiger.citysensor.de/"` | Basically that. Doesn't have to be changed unless you're self-hosting.                                                                                                          |
-| `sheets`             | `Array<sheet>`   |                                        | The list of cheat sheets to rotate through.                                                                                                                                     |
-| `style`              | `string`         | `"default"`                            | Your favorite color theme. You can provide a string                                                                                                                             |
-| `sequence`           | `string`         | `"default"`                            | The direction to loop through the urls list. `null`/`default`, `reverse`, `random`. The `weight` property of an url item will only be respected if sequence is set to `random`. |
-| `updateInterval`     | `int`            | `600000` (10 minutes)                  | The duration of the update interval in ms or `null`.                                                                                                                            |
-| `updateOnSuspension` | `bool`           | `null`                                 | `null`, `false` or `true`. Further explanations below.                                                                                                                          |
-| `showTitle`          | `bool`           | `true`                                 | A boolean to show/hide the title.                                                                                                                                               |
-| `loadingCursor`      | `string`         | `"&nbsp;&block;"`                      | The Text cursor indicating that the module is loading a cheat sheet. Default is `&nbsp;&block;` but could be any string.                                                        |
-| `animationSpeed`     | `int`            | `1000`                                 | The duration of the page transition.                                                                                                                                            |
-| `events`             | `object`         |                                        | An object listing event constants to remap if necessary.                                                                                                                        |
-| `events.sender`      | `string`/`array` | `null`                                 | If this is set, only events sent by the modules with this id will be processed.                                                                                                 |
+| **Option**           | **Type**         | **Default**                            | **Description**                                                                 |
+| -------------------- | ---------------- | -------------------------------------- | ------------------------------------------------------------------------------- |
+| `header`             | `string`         | `"Multigeiger"`                        | The module title.                                                               |
+| `baseURL`            | `string`         | `"https://multigeiger.citysensor.de/"` | Basically that. Doesn't have to be changed.                                     |
+| `updateInterval`     | `int`            | `600000` (10 minutes)                  | The duration of the update interval in ms or `null`.                            |
+| `updateOnSuspension` | `bool`           | `null`                                 | `null`, `false` or `true`. Further explanations below.                          |
+| `showTitle`          | `bool`           | `true`                                 | A boolean to show/hide the title.                                               |
+| `animationSpeed`     | `int`            | `1000`                                 | The duration of the page transition.                                            |
+| `events`             | `object`         |                                        | An object listing event constants to remap if necessary.                        |
+| `events.sender`      | `string`/`array` | `null`                                 | If this is set, only events sent by the modules with this id will be processed. |
 
 ### Sheet list items
 
 The items in the sheet list need a path. All other properties are optional. The `weight` property will be used if the `SENSOR_LIST_ITEM_RANDOM` event is dispatched, or sequence is set to `random`. Options and styles can be set to override the defaults for single items.
-
-```js
-{
-  path: ":random",
-  options: "qTcCQ",
-  style: "lovelace",
-  weight: 10
-}
-```
 
 ### `updateInterval` and `updateOnSuspension`
 
@@ -124,4 +124,4 @@ For ease of use they can be remapped in the `events` object to custom strings. R
 
 Events will be ignored if the module is currently hidden.
 
-[&pi;](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+[&pi;](https://www.youtube.com/watch?v=lQ1U3beoXAc)

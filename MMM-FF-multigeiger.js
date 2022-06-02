@@ -36,7 +36,7 @@ Module.register("MMM-FF-multigeiger", {
       }
     ],
     layout: "list-horizontal",
-    style: "default", // or "monochrome", "color", ["#f00", "#0f0", "#00f" ...]
+    // style: "default", // or "monochrome", "color", ["#f00", "#0f0", "#00f" ...]
     sequence: "default", // null, 'random', 'default', 'reverse'
     updateOnSuspension: null, // null, false or true
     updateInterval: 5 * 60 * 1000, // 5 minutes
