@@ -1,4 +1,4 @@
-![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.png)
+![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.gif)
 
 # MMM-FF-multigeiger
 
