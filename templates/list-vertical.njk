@@ -36,7 +36,13 @@
             <span class="sensorlist-current-cpm show" style="animation-delay: {{ loop.index0 * 125 }}ms">
               <span class="current-value">
                 {% if sensor.avg.statusString === "ok" %}
-                  <span class="value-cpm">{{ sensor.latestVals.cpmAvg.toFixed(1) }}</span>
+                  <span class="value-cpm">
+                    <span class="value-svt">
+                      {% if sensor.latestVals.cpmAvg %}
+                        {{ sensor.latestVals.cpmAvg.toFixed(2) }}
+                      {% endif %}
+                    </span>
+                  </span>
                 {% else %}
                   <i class="sensorlist-icon-status {{ ['SENSOR_ICON_DISABLED', 'SENSOR_ICON_NO_SIGNAL',
                     'SENSOR_ICON_SIGNAL'][sensor.avg.status] | translate | safe }}"></i>
@@ -47,11 +53,15 @@
               </span>
               {% if sensorListConfig.showMinMax != false %}
                 <span class="sensorlist-minmax">
-                  {% if sensor.minVals %}
+                  {% if sensor.minVals.cpmAvg %}
                     <span class="sensorlist-min">{{ sensor.minVals.cpmAvg.toFixed(1) }}
                     </span>
+                  {% endif %}
+                  {% if sensor.avg48Vals.cpmAvg %}
                     <span class="sensorlist-mid">{{ sensor.avg48Vals.cpmAvg.toFixed(1) }}
                     </span>
+                  {% endif %}
+                  {% if sensor.maxVals.cpmAvg %}
                     <span class="sensorlist-max">{{ sensor.maxVals.cpmAvg.toFixed(1) }}
                     </span>
                   {% endif %}
@@ -65,7 +75,11 @@
             <span class="sensorlist-current-svt" style="animation-delay: {{ loop.index0 * 125 }}ms">
               <span class="current-value">
                 {% if sensor.avg.statusString === "ok" %}
-                  <span class="value-svt">{{ sensor.latestVals.uSvphAvg.toFixed(2) }}</span>
+                  <span class="value-svt">
+                    {% if sensor.latestVals.uSvphAvg %}
+                      {{ sensor.latestVals.uSvphAvg.toFixed(2) }}
+                    {% endif %}
+                  </span>
                 {% else %}
                   <i class="sensorlist-icon-status {{ ['SENSOR_ICON_DISABLED', 'SENSOR_ICON_NO_SIGNAL',
                     'SENSOR_ICON_SIGNAL'][sensor.avg.status] | translate | safe }}"></i>
@@ -76,11 +90,15 @@
               </span>
               {% if sensorListConfig.showMinMax != false %}
                 <span class="sensorlist-minmax">
-                  {% if sensor.minVals %}
+                  {% if sensor.minVals.uSvphAvg %}
                     <span class="sensorlist-min">{{ sensor.minVals.uSvphAvg.toFixed(3) }}
                     </span>
+                  {% endif %}
+                  {% if sensor.avg48Vals.uSvphAvg %}
                     <span class="sensorlist-mid">{{ sensor.avg48Vals.uSvphAvg.toFixed(3) }}
                     </span>
+                  {% endif %}
+                  {% if sensor.maxVals.uSvphAvg %}
                     <span class="sensorlist-max">{{ sensor.maxVals.uSvphAvg.toFixed(3) }}
                     </span>
                   {% endif %}

@@ -1,6 +1,6 @@
 {
 	"current": "aktuell",
-	"day": "heute",
+	"24hours": "24 Stunden",
 	"week": "7 Tage",
 	"month": "30 Tage",
 	"SENSOR_ID": "Sensor: #",

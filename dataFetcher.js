@@ -184,7 +184,7 @@ const DataFetcher = function (nodeHelper, config) {
     await getAVGs();
     await getSensorProperties();
 
-    switch (sensorDataListItem.type) {
+    switch (sensorDataListItem.type ?? config.type) {
       case "month":
         await getMonthData();
         break;
@@ -439,7 +439,7 @@ const DataFetcher = function (nodeHelper, config) {
             avgTime: 60,
             live: true,
             moving: true,
-            longAVG: 1
+            longAVG: 48
           }
         })
       );
@@ -467,6 +467,7 @@ const DataFetcher = function (nodeHelper, config) {
         })
       )
       .catch((error) => {
+        console.error(error);
         __errors.push(error);
         updateFrontendData();
         serverTest();
@@ -500,8 +501,8 @@ const DataFetcher = function (nodeHelper, config) {
 
       // avg48
       __avg48Vals[id] = {
-        cpmAvg: radiation.avg48.cpmAvg,
-        uSvphAvg: radiation.avg48.uSvphAvg
+        cpmAvg: radiation.avg48?.cpmAvg,
+        uSvphAvg: radiation.avg48?.uSvphAvg
       };
 
       // get latest

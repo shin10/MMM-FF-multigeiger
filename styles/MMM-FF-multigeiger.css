@@ -707,9 +707,8 @@
 
 .MMM-FF-multigeiger .charts .sensorlist-item .chart-color {
   display: inline-block;
-  width: 1em;
-  height: 1em;
-  margin-right: .5em;
+  width: .7em;
+  height: .7em;
   border-radius: .2em;
 }
 

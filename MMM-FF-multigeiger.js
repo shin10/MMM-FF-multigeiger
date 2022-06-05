@@ -109,7 +109,7 @@ Module.register("MMM-FF-multigeiger", {
     if (!this.config.showTitle) return null;
     if (!this.avgs) return this.config.header;
     return `${this.config.header} ${this.translate(
-      this.sensorListConfig?.type
+      this.sensorListConfig?.type ?? this.config.type ?? ""
     )}`;
   },
 
