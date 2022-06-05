@@ -9,14 +9,20 @@ const axios = require("axios").default;
 const AKT_DATA_URL = "mapdata/getaktdata";
 const SENSOR_PROPS_URL = "api/getprops";
 const SENSOR_ONE_DAY_URL = "fsdata/getfs/oneday";
-// const SENSOR_ONE_WEEK_URL = "fsdata/getfs/oneweek";
+const SENSOR_ONE_WEEK_URL = "fsdata/getfs/oneweek";
 //   "fsdata/getfs/oneweek?start=2022-04-23T14%3A28%3A06%2B02%3A00&sensorid=68627&sensorname=Radiation%20Si22G&avgTime=60&live=false&moving=true&longAVG=48&os=Windows";
-// const SENSOR_ONE_MONTH_URL = "fsdata/getfs/onemonth";
+const SENSOR_ONE_MONTH_URL = "fsdata/getfs/onemonth";
 //   "fsdata/getfs/onemonth?start=2022-05-15T14%3A33%3A35%2B02%3A00&sensorid=68627&sensorname=Radiation%20Si22G&avgTime=60&live=true&moving=true&longAVG=48&os=Windows";
 
 const DataFetcher = function (nodeHelper, config) {
-  var { moduleId, baseURL, sequence, updateOnSuspension, updateInterval } =
-    config;
+  var {
+    moduleId,
+    baseURL,
+    sequence,
+    timeout,
+    updateOnSuspension,
+    updateInterval
+  } = config;
 
   var sensorDataListItems = config.sensorList;
 
@@ -90,6 +96,22 @@ const DataFetcher = function (nodeHelper, config) {
     });
   };
 
+  const serverTest = async () => {
+    await axios
+      .get(baseURL.replace(/^(https?:\/\/\w+?\.)(.*\..*)$/i, "http://$2"), {
+        timeout: timeout
+      })
+      .then((response) => {
+        console.log("multigeiger server ok");
+      })
+      .catch((error) => {
+        console.error(error.response);
+        __errors.push(error);
+        updateFrontendData();
+      });
+    return;
+  };
+
   const getAVGs = async () => {
     if (__avgs) {
       return __avgs;
@@ -98,12 +120,14 @@ const DataFetcher = function (nodeHelper, config) {
 
       const url = baseURL + AKT_DATA_URL;
       await axios
-        .get(url)
+        .get(url, { timeout: timeout })
         .then((response) => {
           __avgs = response.data.avgs ?? [];
         })
         .catch((error) => {
           __errors.push(error);
+          updateFrontendData();
+          serverTest();
         })
         .finally(() => {
           processAVGs();
@@ -153,12 +177,24 @@ const DataFetcher = function (nodeHelper, config) {
   };
 
   const fetchData = async (sensorDataListItem) => {
+    showPreloader();
     __sensorDataListItem = sensorDataListItem;
     __avgs = __avgsFiltered = null;
 
     await getAVGs();
     await getSensorProperties();
-    await get24HourData();
+
+    switch (sensorDataListItem.type) {
+      case "month":
+        await getMonthData();
+        break;
+      case "week":
+        await getWeekData();
+        break;
+      case "24hours":
+      default:
+        await get24HourData();
+    }
 
     updateFrontendData();
     startInterval();
@@ -239,6 +275,7 @@ const DataFetcher = function (nodeHelper, config) {
       if (!__sensorPropertyCache[id]) {
         requests.push(
           axios.get(baseURL + SENSOR_PROPS_URL, {
+            timeout: timeout,
             params: {
               sensorid: id
             }
@@ -267,8 +304,10 @@ const DataFetcher = function (nodeHelper, config) {
           });
         })
       )
-      .catch((errors) => {
-        __errors.push(...errors);
+      .catch((error) => {
+        __errors.push(error);
+        updateFrontendData();
+        serverTest();
       });
   };
 
@@ -284,9 +323,64 @@ const DataFetcher = function (nodeHelper, config) {
 
       requests.push(
         axios.get(baseURL + SENSOR_ONE_DAY_URL, {
+          timeout: timeout,
           params: {
             sensorid: id,
-            start: new Date().toISOString(),
+            start: config.startTime,
+            sensorname: propVals.typ,
+            avgTime: __sensorDataListItem.avgTime ?? config.avgTime ?? 60,
+            live: true,
+            moving: true,
+            longAVG: 1
+          }
+        })
+      );
+
+      // create property object with description from config
+      Object.assign(__sensorPropertyCache[id], {
+        description: __sensorDataListItem?.sensors?.filter(
+          (sensor) => sensor.id === id
+        )[0].description
+      });
+    });
+
+    if (!requests.length) return;
+
+    // fetch
+    await axios
+      .all(requests)
+      .then(
+        axios.spread((...responses) => {
+          responses.forEach((response) => {
+            const id = response.config.params.sensorid;
+            __chartData.day[id] = response.data;
+            getDayChartDataMinMaxAvg(id);
+          });
+        })
+      )
+      .catch((error) => {
+        __errors.push(error);
+        updateFrontendData();
+        serverTest();
+      });
+  };
+
+  const getWeekData = async () => {
+    let sensors = __sensorDataListItem?.sensors;
+
+    // prepare property requests for uncached sensors
+    let requests = [];
+    sensors.forEach((sensor) => {
+      const id = sensor.id;
+      const propVals = __sensorPropertyCache[id]?.values?.[0];
+      if (!propVals) return;
+
+      requests.push(
+        axios.get(baseURL + SENSOR_ONE_WEEK_URL, {
+          timeout: timeout,
+          params: {
+            sensorid: id,
+            start: config.startTime,
             sensorname: propVals.typ,
             avgTime: 60,
             live: true,
@@ -318,8 +412,64 @@ const DataFetcher = function (nodeHelper, config) {
           });
         })
       )
-      .catch((errors) => {
-        __errors.push(...errors);
+      .catch((error) => {
+        __errors.push(error);
+        updateFrontendData();
+        serverTest();
+      });
+  };
+
+  const getMonthData = async () => {
+    let sensors = __sensorDataListItem?.sensors;
+
+    // prepare property requests for uncached sensors
+    let requests = [];
+    sensors.forEach((sensor) => {
+      const id = sensor.id;
+      const propVals = __sensorPropertyCache[id]?.values?.[0];
+      if (!propVals) return;
+
+      requests.push(
+        axios.get(baseURL + SENSOR_ONE_MONTH_URL, {
+          timeout: timeout,
+          params: {
+            sensorid: id,
+            start: config.startTime,
+            sensorname: propVals.typ,
+            avgTime: 60,
+            live: true,
+            moving: true,
+            longAVG: 1
+          }
+        })
+      );
+
+      // create property object with description from config
+      Object.assign(__sensorPropertyCache[id], {
+        description: __sensorDataListItem?.sensors?.filter(
+          (sensor) => sensor.id === id
+        )[0].description
+      });
+    });
+
+    if (!requests.length) return;
+
+    // fetch
+    await axios
+      .all(requests)
+      .then(
+        axios.spread((...responses) => {
+          responses.forEach((response) => {
+            const id = response.config.params.sensorid;
+            __chartData.day[id] = response.data;
+            getDayChartDataMinMaxAvg(id);
+          });
+        })
+      )
+      .catch((error) => {
+        __errors.push(error);
+        updateFrontendData();
+        serverTest();
       });
   };
 

@@ -1,0 +1,227 @@
+/* Magic Mirror
+ * Module: MMM-FF-multigeiger
+ *
+ * By Michael Trenkler
+ * ISC Licensed.
+ */
+
+.MMM-FF-multigeiger {
+  .list-vertical {
+    .sensorlist {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .sensorlist-item {
+      margin: 0.5rem 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+
+      .graph-wrapper {
+        overflow: hidden;
+        text-align: right;
+        height: 5rem;
+        position: relative;
+        width: 200px;
+      }
+
+      @keyframes svg-fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      svg {
+        opacity: 0;
+        animation: svg-fade-in 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1
+          forwards;
+        animation-delay: inherit;
+        width: 200px;
+        height: 5rem;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+
+      &.disabled {
+        opacity: 0.3;
+      }
+      &.unreachable {
+        opacity: 0.6;
+      }
+    }
+
+    .sensorlist-item-info {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+    }
+
+    .sensorlist-id {
+      font-size: 0.5rem;
+    }
+
+    .sensorlist-icon-indoor {
+      font-size: 0.75rem;
+    }
+
+    .sensorlist-icon-status {
+      opacity: 0.25;
+      font-size: 0.75em;
+    }
+
+    .sensorlist-current {
+      height: 2.75rem;
+      margin-left: 0.5rem;
+      font-size: 1.8rem;
+      position: relative;
+      width: 5rem;
+    }
+
+    .sensorlist-current-cpm,
+    .sensorlist-current-svt {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      margin: 0;
+      white-space: nowrap;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    @keyframes sensorlist-show {
+      from {
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes sensorlist-hide {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-1rem);
+      }
+    }
+
+    .sensorlist-current-cpm,
+    .sensorlist-current-svt {
+      opacity: 0;
+      transform: translateY(1rem);
+
+      &.show {
+        animation: sensorlist-show 0.4s ease-out 1 forwards;
+      }
+      &.hide {
+        opacity: 1;
+        transform: translateY(0);
+        animation: sensorlist-hide 0.4s ease-out 1 forwards;
+      }
+    }
+
+    .current-value {
+      font-weight: 300;
+      font-size: 1em;
+    }
+
+    .current-label {
+      font-weight: 400;
+      font-size: 0.4em;
+      width: 2rem;
+    }
+
+    .sensorlist-lastseen {
+      font-size: 0.6rem;
+      margin: 0.5rem;
+      display: block;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .sensorlist-description {
+      margin: 0.75rem 0 0rem;
+    }
+
+    .sensorlist-name {
+      font-size: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .sensorlist-address {
+      font-size: 0.5rem;
+    }
+    .sensorlist-address-line {
+      display: flex;
+      flex-direction: row;
+      justify-content: right;
+    }
+
+    .sensorlist-minmax {
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      font-size: 0.5rem;
+      text-align: left;
+    }
+    .sensorlist-min {
+      color: #99ff33;
+      white-space: nowrap;
+      margin-right: 1em;
+    }
+    .sensorlist-mid {
+      white-space: nowrap;
+      margin-right: 1em;
+    }
+    .sensorlist-max {
+      color: #cc3300;
+      white-space: nowrap;
+    }
+    .sensorlist-region {
+      display: none;
+    }
+    .sensorlist-type {
+      display: none;
+    }
+  }
+}
+
+.region.right {
+  .MMM-FF-multigeiger {
+    .list-vertical {
+      @keyframes graph-wrapper-scale {
+        from {
+          width: 0;
+          opacity: 0;
+        }
+        to {
+          width: 200px;
+          opacity: 1;
+        }
+      }
+
+      .graph-wrapper {
+        width: 0;
+        animation: graph-wrapper-scale 700ms
+          cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
+      }
+    }
+  }
+}

@@ -16,9 +16,9 @@ module.exports = NodeHelper.create({
   },
 
   getFetcher: function (config) {
-    let instance = this.fetcherInstances.filter(
-      (instance) => instance.moduleId === config.moduleId
-    )[0];
+    let instance = this.fetcherInstances.filter((_) => {
+      return _.moduleId === config.moduleId;
+    })[0];
     if (!instance) {
       instance = new DataFetcher(this, config);
       this.fetcherInstances.push(instance);
@@ -28,6 +28,8 @@ module.exports = NodeHelper.create({
 
   socketNotificationReceived: function (notification, payload) {
     if (!payload.config) return;
+
+    console.log('###########', notification, payload)
 
     const fetcher = this.getFetcher(payload.config);
 

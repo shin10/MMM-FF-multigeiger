@@ -10,9 +10,72 @@
   padding-bottom: 1rem;
 }
 
+.MMM-FF-multigeiger .loading {
+  display: block;
+  font-weight: 300;
+  word-wrap: nowrap;
+  text-align: center;
+  opacity: 0.25;
+  margin: 1rem;
+}
+
+@-webkit-keyframes MMM-FF-multigeiger-loading-spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@keyframes MMM-FF-multigeiger-loading-spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+.MMM-FF-multigeiger .loading-spinner-icon {
+  -webkit-animation: MMM-FF-multigeiger-loading-spinner 1s linear infinite;
+          animation: MMM-FF-multigeiger-loading-spinner 1s linear infinite;
+}
+
+.MMM-FF-multigeiger .loading-spinner-icon .MMM-FF-multigeiger.module-header {
+  margin: 1rem 1rem 0 1rem;
+}
+
+.MMM-FF-multigeiger .loading-spinner-icon .MMM-FF-multigeiger .module-content {
+  width: 100%;
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  justify-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -ms-flex-line-pack: center;
+      align-content: center;
+}
+
+/* Magic Mirror
+ * Module: MMM-FF-multigeiger
+ *
+ * By Michael Trenkler
+ * ISC Licensed.
+ */
 .MMM-FF-multigeiger .list-horizontal {
   width: 100%;
-  height: 10rem;
+  max-width: 100vw;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -35,6 +98,14 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: row;
           flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
 }
 
 .MMM-FF-multigeiger .list-horizontal .sensorlist-item {
@@ -50,7 +121,38 @@
   min-width: 7rem;
 }
 
+@-webkit-keyframes graph-wrapper-vertical-scale {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: 50px;
+    opacity: 1;
+  }
+}
+
+@keyframes graph-wrapper-vertical-scale {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: 50px;
+    opacity: 1;
+  }
+}
+
+.MMM-FF-multigeiger .list-horizontal .sensorlist-item .graph-wrapper {
+  height: 0;
+  position: relative;
+  -webkit-animation: graph-wrapper-vertical-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
+          animation: graph-wrapper-vertical-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
+}
+
 .MMM-FF-multigeiger .list-horizontal .sensorlist-item svg {
+  bottom: 0;
+  left: 0;
   width: 100%;
   height: 50px;
 }
@@ -253,6 +355,12 @@
   display: none;
 }
 
+/* Magic Mirror
+ * Module: MMM-FF-multigeiger
+ *
+ * By Michael Trenkler
+ * ISC Licensed.
+ */
 .MMM-FF-multigeiger .list-vertical .sensorlist {
   list-style: none;
   margin: 0;
@@ -281,12 +389,43 @@
           flex-direction: row;
 }
 
+.MMM-FF-multigeiger .list-vertical .sensorlist-item .graph-wrapper {
+  overflow: hidden;
+  text-align: right;
+  height: 5rem;
+  position: relative;
+  width: 200px;
+}
+
+@-webkit-keyframes svg-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes svg-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .MMM-FF-multigeiger .list-vertical .sensorlist-item svg {
+  opacity: 0;
+  -webkit-animation: svg-fade-in 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
+          animation: svg-fade-in 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
+  -webkit-animation-delay: inherit;
+          animation-delay: inherit;
   width: 200px;
   height: 5rem;
-  -webkit-box-ordinal-group: 3;
-      -ms-flex-order: 2;
-          order: 2;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .MMM-FF-multigeiger .list-vertical .sensorlist-item.disabled {
@@ -483,68 +622,261 @@
   display: none;
 }
 
-.MMM-FF-multigeiger .loading {
-  display: block;
-  font-weight: 300;
-  word-wrap: nowrap;
-  text-align: center;
-  opacity: 0.25;
-  margin: 1rem;
-}
-
-.MMM-FF-multigeiger .loading-spinner-icon {
-  -webkit-animation: MMM-FF-multigeiger-loading-spinner 1s linear infinite;
-          animation: MMM-FF-multigeiger-loading-spinner 1s linear infinite;
-}
-
-@-webkit-keyframes MMM-FF-multigeiger-loading-spinner {
-  0% {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
+@-webkit-keyframes graph-wrapper-scale {
+  from {
+    width: 0;
+    opacity: 0;
   }
-  100% {
-    -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
+  to {
+    width: 200px;
+    opacity: 1;
   }
 }
 
-@keyframes MMM-FF-multigeiger-loading-spinner {
-  0% {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
+@keyframes graph-wrapper-scale {
+  from {
+    width: 0;
+    opacity: 0;
   }
-  100% {
-    -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
+  to {
+    width: 200px;
+    opacity: 1;
   }
 }
 
-.MMM-FF-multigeiger .loading-pager {
-  color: #555;
+.region.right .MMM-FF-multigeiger .list-vertical .graph-wrapper {
+  width: 0;
+  -webkit-animation: graph-wrapper-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
+          animation: graph-wrapper-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
 }
 
-.MMM-FF-multigeiger .MMM-FF-multigeiger.module-header {
-  margin: 1rem 1rem 0 1rem;
+/* Magic Mirror
+ * Module: MMM-FF-multigeiger
+ *
+ * By Michael Trenkler
+ * ISC Licensed.
+ */
+.MMM-FF-multigeiger .charts .sensorlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 
-.MMM-FF-multigeiger .MMM-FF-multigeiger .multigeiger {
-  padding: 1rem;
+.MMM-FF-multigeiger .charts .graph-wrapper {
+  width: calc(100vw - var(--gap-body-left) - var(--gap-body-right));
+  height: calc(40vw - var(--gap-body-left) - var(--gap-body-right));
 }
 
-.MMM-FF-multigeiger .MMM-FF-multigeiger .module-content {
+.MMM-FF-multigeiger .charts .graph-wrapper svg {
   width: 100%;
+  height: 100%;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-item {
+  margin: 1rem 0.5rem;
+  padding: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  min-width: 7rem;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-item.disabled {
+  opacity: 0.3;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-item.unreachable {
+  opacity: 0.6;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-item .chart-color {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: .5em;
+  border-radius: .2em;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-id {
+  font-size: 0.5rem;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-icon-indoor {
+  font-size: 0.75rem;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-icon-status {
+  opacity: 0.25;
+  font-size: 0.75em;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-current {
+  height: 2.5rem;
+  font-size: 2rem;
+  position: relative;
+}
+
+@keyframes sensorlist-show {
+  from {
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+}
+
+@keyframes sensorlist-hide {
+  from {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    -webkit-transform: translateY(-1rem);
+            transform: translateY(-1rem);
+  }
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-current-cpm,
+.MMM-FF-multigeiger .charts .sensorlist-current-svt {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0.5rem;
+  white-space: nowrap;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-current-cpm,
+.MMM-FF-multigeiger .charts .sensorlist-current-svt {
+  opacity: 0;
+  -webkit-transform: translateY(1rem);
+          transform: translateY(1rem);
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-current-cpm.show,
+.MMM-FF-multigeiger .charts .sensorlist-current-svt.show {
+  -webkit-animation: sensorlist-show 0.4s ease-out 1 forwards;
+          animation: sensorlist-show 0.4s ease-out 1 forwards;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-current-cpm.hide,
+.MMM-FF-multigeiger .charts .sensorlist-current-svt.hide {
+  opacity: 1;
+  -webkit-transform: translateY(0);
+          transform: translateY(0);
+  -webkit-animation: sensorlist-hide 0.4s ease-out 1 forwards;
+          animation: sensorlist-hide 0.4s ease-out 1 forwards;
+}
+
+.MMM-FF-multigeiger .charts .current-value {
+  font-weight: 300;
+  font-size: 1em;
+}
+
+.MMM-FF-multigeiger .charts .current-label {
+  font-weight: 400;
+  font-size: 0.4em;
+  width: 2rem;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-lastseen {
+  font-size: 0.6rem;
+  margin: 0.25rem;
+  display: block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-description {
+  margin: 0.5rem;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-name {
+  font-size: 0.5rem;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-address {
+  font-size: 0.5rem;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-address-line {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-minmax {
   height: 100%;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  justify-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -ms-flex-line-pack: center;
-      align-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: reverse;
+      -ms-flex-direction: column-reverse;
+          flex-direction: column-reverse;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  font-size: 0.5rem;
+  width: 2rem;
+  text-align: right;
+  margin-right: 0.35rem;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-min {
+  color: #99ff33;
+  white-space: nowrap;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-max {
+  color: #cc3300;
+  white-space: nowrap;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-region {
+  display: none;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-type {
+  display: none;
 }
 /*# sourceMappingURL=MMM-FF-multigeiger.css.map */

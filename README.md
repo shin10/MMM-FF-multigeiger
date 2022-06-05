@@ -51,7 +51,7 @@ $(
       {
         description: "Current Radiation",
         weight: 1,
-        type: "current",
+        type: "24hours",
         layout: "list-horizontal",
         toggleUnitInterval: 10000,
         sensors: [
@@ -65,7 +65,7 @@ $(
       {
         description: "Current Radiation",
         weight: 1,
-        type: "current",
+        type: "24hours",
         layout: "list-horizontal",
         toggleUnitInterval: 4000,
         sensors: [
@@ -77,9 +77,14 @@ $(
       },
     ],
     events: {
+      sender: ["MMM-Touch", "module_0_MMM-GroveGestures"],
       SENSOR_LIST_ITEM_PREVIOUS: "SENSOR_LIST_ITEM_PREVIOUS",
       SENSOR_LIST_ITEM_NEXT: "SENSOR_LIST_ITEM_NEXT",
-      SENSOR_LIST_ITEM_RANDOM: "SENSOR_LIST_ITEM_RANDOM"
+      SENSOR_LIST_ITEM_RANDOM: "SENSOR_LIST_ITEM_RANDOM",
+      SENSOR_LIST_ITEM_NEXT: "SENSOR_LIST_ITEM_NEXT",
+      ARTICLE_PREVIOUS: "SENSOR_LIST_ITEM_PREVIOUS",
+      ARTICLE_RANDOM: "SENSOR_LIST_ITEM_RANDOM",
+      ARTICLE_NEXT: "SENSOR_LIST_ITEM_NEXT",
     }
   },
 },
@@ -87,20 +92,20 @@ $(
 
 ### Configuration Options
 
-| **Option**           | **Type**         | **Default**                            | **Description**                                                                 |
-| -------------------- | ---------------- | -------------------------------------- | ------------------------------------------------------------------------------- |
-| `header`             | `string`         | `"Multigeiger"`                        | The module title.                                                               |
-| `baseURL`            | `string`         | `"https://multigeiger.citysensor.de/"` | Basically that. Doesn't have to be changed.                                     |
-| `updateInterval`     | `int`            | `600000` (10 minutes)                  | The duration of the update interval in ms or `null`.                            |
-| `updateOnSuspension` | `bool`           | `null`                                 | `null`, `false` or `true`. Further explanations below.                          |
-| `showTitle`          | `bool`           | `true`                                 | A boolean to show/hide the title.                                               |
-| `animationSpeed`     | `int`            | `1000`                                 | The duration of the page transition.                                            |
-| `events`             | `object`         |                                        | An object listing event constants to remap if necessary.                        |
-| `events.sender`      | `string`/`array` | `null`                                 | If this is set, only events sent by the modules with this id will be processed. |
+| **Option**           | **Type**         | **Default**                            | **Description**                                                                             |
+| -------------------- | ---------------- | -------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `header`             | `string`         | `"Multigeiger"`                        | The module title.                                                                           |
+| `baseURL`            | `string`         | `"https://multigeiger.citysensor.de/"` | Basically that. Doesn't have to be changed.                                                 |
+| `updateInterval`     | `int`            | `600000` (10 minutes)                  | The duration of the update interval in ms or `null`.                                        |
+| `updateOnSuspension` | `bool`           | `null`                                 | `null`, `false` or `true`. Further explanations below.                                      |
+| `showTitle`          | `bool`           | `true`                                 | A boolean to show/hide the title.                                                           |
+| `animationSpeed`     | `int`            | `1000`                                 | The duration of the page transition.                                                        |
+| `events`             | `object`         |                                        | An object listing event constants to remap if necessary.                                    |
+| `events.sender`      | `string`/`array` | `null`                                 | If this is set, only events sent by the modules with this `name` or `id` will be processed. |
 
-### Sheet list items
+### Sensor list items
 
-The items in the sheet list need a path. All other properties are optional. The `weight` property will be used if the `SENSOR_LIST_ITEM_RANDOM` event is dispatched, or sequence is set to `random`. Options and styles can be set to override the defaults for single items.
+The items in the sensor list define the collection of sensors. Further you can override the global properties per sensorList item to switch `layout` or data amount (`type`). The `weight` property will be used if the `SENSOR_LIST_ITEM_RANDOM` event is dispatched, or sequence is set to `random`.
 
 ### `updateInterval` and `updateOnSuspension`
 

@@ -1,0 +1,185 @@
+/* Magic Mirror
+ * Module: MMM-FF-multigeiger
+ *
+ * By Michael Trenkler
+ * ISC Licensed.
+ */
+
+.MMM-FF-multigeiger {
+  .charts {
+
+    .sensorlist {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .graph-wrapper {
+      width: calc(100vw - var(--gap-body-left) - var(--gap-body-right));
+      height: calc(40vw - var(--gap-body-left) - var(--gap-body-right));
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .sensorlist-item {
+      margin: 1rem 0.5rem;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-width: 7rem;
+
+      &.disabled {
+        opacity: 0.3;
+      }
+      &.unreachable {
+        opacity: 0.6;
+      }
+
+      &.ok {
+      }
+
+      .chart-color {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        margin-right: .5em;
+        border-radius: .2em;
+      }
+    }
+
+    .sensorlist-id {
+      font-size: 0.5rem;
+    }
+
+    .sensorlist-icon-indoor {
+      font-size: 0.75rem;
+    }
+
+    .sensorlist-icon-status {
+      opacity: 0.25;
+      font-size: 0.75em;
+    }
+
+    .sensorlist-current {
+      height: 2.5rem;
+      font-size: 2rem;
+      position: relative;
+    }
+
+    @keyframes sensorlist-show {
+      from {
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes sensorlist-hide {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-1rem);
+      }
+    }
+
+    .sensorlist-current-cpm,
+    .sensorlist-current-svt {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      margin: 0.5rem;
+      white-space: nowrap;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .sensorlist-current-cpm,
+    .sensorlist-current-svt {
+      opacity: 0;
+      transform: translateY(1rem);
+
+      &.show {
+        animation: sensorlist-show 0.4s ease-out 1 forwards;
+      }
+      &.hide {
+        opacity: 1;
+        transform: translateY(0);
+        animation: sensorlist-hide 0.4s ease-out 1 forwards;
+      }
+    }
+
+    .current-value {
+      font-weight: 300;
+      font-size: 1em;
+    }
+
+    .current-label {
+      font-weight: 400;
+      font-size: 0.4em;
+      width: 2rem;
+    }
+
+    .sensorlist-lastseen {
+      font-size: 0.6rem;
+      margin: 0.25rem;
+      display: block;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .sensorlist-description {
+      margin: 0.5rem;
+    }
+
+    .sensorlist-name {
+      font-size: 0.5rem;
+    }
+
+    .sensorlist-address {
+      font-size: 0.5rem;
+    }
+    .sensorlist-address-line {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+
+    .sensorlist-minmax {
+      height: 100%;
+      display: flex;
+      flex-direction: column-reverse;
+      justify-content: flex-end;
+      font-size: 0.5rem;
+      width: 2rem;
+      text-align: right;
+      margin-right: 0.35rem;
+    }
+    .sensorlist-min {
+      color: #99ff33;
+      white-space: nowrap;
+    }
+    .sensorlist-max {
+      color: #cc3300;
+      white-space: nowrap;
+    }
+    .sensorlist-region {
+      display: none;
+    }
+    .sensorlist-type {
+      display: none;
+    }
+  }
+}

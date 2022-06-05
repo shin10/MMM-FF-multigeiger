@@ -6,22 +6,29 @@
     <ul class="sensorlist">
       {% for sensor in sensors %}
         <li class="sensorlist-item {{ sensor.avg.statusString }}" data-sensor="{{ sensor.id }}">
+          {% if sensorListConfig.showGraph != false %}
+            <div class="graph-wrapper" style="animation-delay: {{ loop.index0 * 125 }}ms"></div>
+          {% endif %}
           <span class="sensorlist-name">{{ sensor.avg.name }}
-            <i class="sensorlist-icon-indoor dimmed {{ ['SENSOR_ICON_OUTDOOR', 'SENSOR_ICON_INDOOR'][sensor.avg.indoor] | translate |
-              safe }}"></i>
+            {% if sensorListConfig.showInstallationSite != false %}
+              <i class="sensorlist-icon-indoor dimmed {{ ['SENSOR_ICON_OUTDOOR', 'SENSOR_ICON_INDOOR'][sensor.avg.indoor] | translate |
+                safe }}"></i>
+            {% endif %}
           </span>
           <span class="sensorlist-current">
             <span class="sensorlist-current-cpm show" style="animation-delay: {{ loop.index0 * 125 }}ms">
-              <span class="sensorlist-minmax">
-                {% if sensor.minVals %}
-                  <span class="sensorlist-min">{{ sensor.minVals.cpmAvg.toFixed(1) }}
-                  </span>
-                  {# <span class="sensorlist-mid">{{ sensor.avg48Vals.cpmAvg.toFixed(1) }}
-                                                                    </span> #}
-                  <span class="sensorlist-max">{{ sensor.maxVals.cpmAvg.toFixed(1) }}
-                  </span>
-                {% endif %}
-              </span>
+              {% if sensorListConfig.showMinMax != false %}
+                <span class="sensorlist-minmax">
+                  {% if sensor.minVals %}
+                    <span class="sensorlist-min">{{ sensor.minVals.cpmAvg.toFixed(1) }}
+                    </span>
+                    {# <span class="sensorlist-mid">{{ sensor.avg48Vals.cpmAvg.toFixed(1) }}
+                                                                                                                                                                                                            </span> #}
+                    <span class="sensorlist-max">{{ sensor.maxVals.cpmAvg.toFixed(1) }}
+                    </span>
+                  {% endif %}
+                </span>
+              {% endif %}
               <span class="current-value">
                 {% if sensor.avg.statusString === "ok" %}
                   <span class="value-cpm">{{ sensor.latestVals.cpmAvg.toFixed(1) }}</span>
@@ -39,8 +46,7 @@
                 {% if sensor.minVals %}
                   <span class="sensorlist-min">{{ sensor.minVals.uSvphAvg.toFixed(3) }}
                   </span>
-                  {# <span class="sensorlist-mid">{{ sensor.avg48Vals.uSvphAvg.toFixed(3) }}
-                                                                    </span> #}
+                  {# <span class="sensorlist-mid">{{ sensor.avg48Vals.uSvphAvg.toFixed(3) }}</span> #}
                   <span class="sensorlist-max">{{ sensor.maxVals.uSvphAvg.toFixed(3) }}
                   </span>
                 {% endif %}
@@ -60,22 +66,28 @@
           </span>
           {# <span class="sensorlist-lastseen">{{ sensor.properties.values[0].lastSeen | replace(r/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}).*/, "$1 $2") }}</span> #}
           <span class="sensorlist-description">{{ sensor.description }}</span>
-          <span class="sensorlist-id">{{ "SENSOR_ID" | translate | safe }}{{ sensor.id }}</span>
+          {% if sensorListConfig.showSensorId != false %}
+            <span class="sensorlist-id">{{ "SENSOR_ID" | translate | safe }}{{ sensor.id }}</span>
+          {% endif %}
           <span class="sensorlist-type">{{ sensor.properties.values[0].typ }}</span>
           <span class="sensorlist-indoor">
             {{ ["SENSOR_OUTDOOR", "SENSOR_INDOOR"][sensor.indoor] | translate | safe }}
           </span>
-          <span class="sensorlist-address">
-            <span class="sensorlist-address-line">
-              <span class="sensorlist-street">{{ sensor.properties.values[0].address.street }}</span>&nbsp;
-              <span class="sensorlist-streetnumber">{{ sensor.properties.values[0].address.number }}</span>
+          {% if sensorListConfig.showAddress != false %}
+            <span class="sensorlist-address">
+              <span class="sensorlist-address-line">
+                <span class="sensorlist-street">{{ sensor.properties.values[0].address.street }}</span>&nbsp;
+                <span class="sensorlist-streetnumber">{{ sensor.properties.values[0].address.number }}</span>
+              </span>
+              <span class="sensorlist-address-line">
+                <span class="sensorlist-zip">{{ sensor.properties.values[0].address.plz }}</span>&nbsp;
+                <span class="sensorlist-city">{{ sensor.properties.values[0].address.city }}</span>
+              </span>
             </span>
-            <span class="sensorlist-address-line">
-              <span class="sensorlist-zip">{{ sensor.properties.values[0].address.plz }}</span>&nbsp;
-              <span class="sensorlist-city">{{ sensor.properties.values[0].address.city }}</span>
-            </span>
-          </span>
-          <span class="sensorlist-region">{{ sensor.properties.values[0].address.region }}</span>
+          {% endif %}
+          {% if sensorListConfig.showRegion != false %}
+            <span class="sensorlist-region">{{ sensor.properties.values[0].address.region }}</span>
+          {% endif %}
         </li>
       {% endfor %}
     </ul>
