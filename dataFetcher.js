@@ -209,6 +209,7 @@ const DataFetcher = function (nodeHelper, config) {
   this.getSensorDataPrevious = () => fetchData(getSensorListItemPrevious());
   this.getSensorDataNext = () => fetchData(getSensorListItemNext());
   this.getSensorDataRandom = () => fetchData(getSensorListItemRandom());
+  this.getSensorData = () => fetchData();
 
   const getSensorListItemInitial = () => {
     let idx;

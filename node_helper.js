@@ -46,6 +46,9 @@ module.exports = NodeHelper.create({
       case "GET_RANDOM_SENSOR_LIST_ITEM":
         fetcher.getSensorDataRandom();
         break;
+      case "UPDATE_SENSOR_LIST_ITEM":
+        fetcher.getSensorData();
+        break;
       case "SUSPEND":
         fetcher.suspend();
         break;

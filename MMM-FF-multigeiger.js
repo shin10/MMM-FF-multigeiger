@@ -163,10 +163,47 @@ Module.register("MMM-FF-multigeiger", {
     };
   },
 
-  setStartTime() {
-    this.config.startTime = d3
-      .timeFormat("%Y-%m-%dT%H:%M:%S%Z")(new Date())
+  dateToW3CString(date) {
+    return d3
+      .timeFormat("%Y-%m-%dT%H:%M:%S%Z")(date)
       .replace(/(\d\d)$/, ":$1");
+  },
+
+  setStartTime(val) {
+    const DAY = 24 * 60 * 60 * 1000;
+    const dateRangeVals = {
+      "24hours": 1,
+      "week": 7,
+      "month": 30
+    }
+    let date;
+    switch (val) {
+      case "backwards":
+        date = new Date(this.config.startTime?.valueOf() + dateRangeVals[this.config.type]);
+        date.setHours(0);
+        date.setMinutes(0);
+        break;
+      case "forward":
+        date = new Date(this.config.startTime?.valueOf() + dateRangeVals[this.config.type]);
+        if (date.valueOf() > Date.now()) {
+          date = new Date();
+        } else {
+          date.setHours(0);
+          date.setMinutes(0);
+        }
+        break;
+      case "now":
+        date = new Date();
+        break;
+      default:
+        if (val !== undefined) {
+          date = val;
+        } else {
+          date = new Date()
+        }
+        break;
+    }
+    this.config.startTime = this.dateToW3CString(date);
   },
 
   toggleUnitIntervalFunction() {
@@ -282,7 +319,8 @@ Module.register("MMM-FF-multigeiger", {
   },
 
   chartColorFn(sheetListConfig) {
-    const colorTheme = sheetListConfig?.chartColors ?? this.config.chartColors ?? "default";
+    const colorTheme =
+      sheetListConfig?.chartColors ?? this.config.chartColors ?? "default";
 
     if (Array.isArray(colorTheme)) {
       return (i) => {
@@ -583,6 +621,8 @@ Module.register("MMM-FF-multigeiger", {
 
     this.config.events[notification]?.split(" ").forEach((e) => {
       this.setStartTime();
+      const dateRangeTypes = ["24hours", "week", "month"];
+      const layoutTypes = ["list-vertical", "list-horizontal", "charts"];
       switch (e) {
         case "SENSOR_LIST_ITEM_PREVIOUS":
           if (!this.hidden)
@@ -601,6 +641,62 @@ Module.register("MMM-FF-multigeiger", {
             this.sendSocketNotification("GET_RANDOM_SENSOR_LIST_ITEM", {
               config: this.config
             });
+          break;
+        case "SENSOR_LIST_DATE_BACKWARDS":
+          if (!this.hidden) {
+            this.setStartTime("backwards");
+            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+              config: this.config
+            });
+          }
+          break;
+        case "SENSOR_LIST_DATE_NOW":
+          if (!this.hidden) {
+            this.setStartTime("now");
+            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+              config: this.config
+            });
+          }
+          break;
+        case "SENSOR_LIST_DATE_FORWARDS":
+          if (!this.hidden) {
+            this.setStartTime("forwards");
+            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+              config: this.config
+            });
+          }
+          break;
+        case "SENSOR_LIST_DATE_RANGE_ZOOM_IN":
+          if (!this.hidden) {
+            this.config.type = dateRangeTypes[ (dateRangeTypes.length + --dateRangeTypes.indexOf(this.config.type) -1 ) % dateRangeTypes.length ];
+            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+              config: this.config
+            });
+          }
+          break;
+        case "SENSOR_LIST_DATE_RANGE_ZOOM_OUT":
+            if (!this.hidden) {
+            this.config.type = dateRangeTypes[ (dateRangeTypes.length + dateRangeTypes.indexOf(this.config.type) +1 ) % dateRangeTypes.length ];
+            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+              config: this.config
+            });
+          }
+          break;
+        case "SENSOR_LIST_LAYOUT_PREVIOUS":
+            if (!this.hidden) {
+            this.config.layout = layoutTypes[ (layoutTypes.length + layoutTypes.indexOf(this.config.type) -1 ) % layoutTypes.length ];
+            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+              config: this.config
+            });
+          }
+          break;
+        case "SENSOR_LIST_LAYOUT_NEXT":
+            if (!this.hidden) {
+            this.config.layout = layoutTypes[ (layoutTypes.length + layoutTypes.indexOf(this.config.type) +1 ) % layoutTypes.length ];
+            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+              config: this.config
+            });
+          }
           break;
         default:
           break;
