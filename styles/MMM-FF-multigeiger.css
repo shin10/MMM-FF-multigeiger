@@ -145,6 +145,7 @@
 
 .MMM-FF-multigeiger .list-horizontal .sensorlist-item .graph-wrapper {
   height: 0;
+  opacity: 0;
   position: relative;
   -webkit-animation: graph-wrapper-vertical-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
           animation: graph-wrapper-vertical-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
@@ -174,6 +175,11 @@
 }
 
 .MMM-FF-multigeiger .list-horizontal .sensorlist-icon-status {
+  opacity: 0.25;
+  font-size: 0.75em;
+}
+
+.MMM-FF-multigeiger .list-horizontal .sensorlist-icon-missing-data {
   opacity: 0.25;
   font-size: 0.75em;
 }
@@ -460,6 +466,11 @@
   font-size: 0.75em;
 }
 
+.MMM-FF-multigeiger .list-vertical .sensorlist-icon-missing-data {
+  opacity: 0.25;
+  font-size: 0.75em;
+}
+
 .MMM-FF-multigeiger .list-vertical .sensorlist-current {
   height: 2.75rem;
   margin-left: 0.5rem;
@@ -646,6 +657,7 @@
 
 .region.right .MMM-FF-multigeiger .list-vertical .graph-wrapper {
   width: 0;
+  opacity: 0;
   -webkit-animation: graph-wrapper-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
           animation: graph-wrapper-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
 }
@@ -721,6 +733,11 @@
 }
 
 .MMM-FF-multigeiger .charts .sensorlist-icon-status {
+  opacity: 0.25;
+  font-size: 0.75em;
+}
+
+.MMM-FF-multigeiger .charts .sensorlist-icon-missing-data {
   opacity: 0.25;
   font-size: 0.75em;
 }

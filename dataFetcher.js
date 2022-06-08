@@ -6,13 +6,21 @@
  */
 
 const axios = require("axios").default;
+const dayjs = require("dayjs");
 const AKT_DATA_URL = "mapdata/getaktdata";
 const SENSOR_PROPS_URL = "api/getprops";
 const SENSOR_ONE_DAY_URL = "fsdata/getfs/oneday";
 const SENSOR_ONE_WEEK_URL = "fsdata/getfs/oneweek";
-//   "fsdata/getfs/oneweek?start=2022-04-23T14%3A28%3A06%2B02%3A00&sensorid=68627&sensorname=Radiation%20Si22G&avgTime=60&live=false&moving=true&longAVG=48&os=Windows";
 const SENSOR_ONE_MONTH_URL = "fsdata/getfs/onemonth";
-//   "fsdata/getfs/onemonth?start=2022-05-15T14%3A33%3A35%2B02%3A00&sensorid=68627&sensorname=Radiation%20Si22G&avgTime=60&live=true&moving=true&longAVG=48&os=Windows";
+
+const NOW = "now";
+const DAY = "day";
+const WEEK = "week";
+const MONTH = "month";
+const RANDOM = "random";
+const REVERSE = "reverse";
+const DEFAULT = "default";
+const DEFAULT_AVG_TIME = 60;
 
 const DataFetcher = function (nodeHelper, config) {
   var {
@@ -161,14 +169,14 @@ const DataFetcher = function (nodeHelper, config) {
     let sensorDataListItemUpcoming;
 
     switch (sequence) {
-      case "random":
+      case RANDOM:
         sensorDataListItemUpcoming = getSensorListItemRandom();
         break;
-      case "reverse":
+      case REVERSE:
         sensorDataListItemUpcoming = getSensorListItemPrevious();
         break;
       default:
-      case "default":
+      case DEFAULT:
         sensorDataListItemUpcoming = getSensorListItemNext();
         break;
     }
@@ -185,13 +193,13 @@ const DataFetcher = function (nodeHelper, config) {
     await getSensorProperties();
 
     switch (sensorDataListItem.type ?? config.type) {
-      case "month":
+      case MONTH:
         await getMonthData();
         break;
-      case "week":
+      case WEEK:
         await getWeekData();
         break;
-      case "24hours":
+      case DAY:
       default:
         await get24HourData();
     }
@@ -209,19 +217,25 @@ const DataFetcher = function (nodeHelper, config) {
   this.getSensorDataPrevious = () => fetchData(getSensorListItemPrevious());
   this.getSensorDataNext = () => fetchData(getSensorListItemNext());
   this.getSensorDataRandom = () => fetchData(getSensorListItemRandom());
-  this.getSensorData = () => fetchData();
+  this.updateConfig = (_config) => {
+    config = _config;
+    __sensorDataListItem = config.sensorList.filter(
+      (_) => __sensorDataListItem.__id === _.__id
+    )[0];
+    fetchData(__sensorDataListItem);
+  };
 
   const getSensorListItemInitial = () => {
     let idx;
     switch (sequence) {
-      case "random":
+      case RANDOM:
         this.getRandomSensorDataListItem();
         return;
-      case "reverse":
+      case REVERSE:
         idx = sensorDataListItems.length - 1;
         break;
       default:
-      case "default":
+      case DEFAULT:
         idx = 0;
         break;
     }
@@ -312,6 +326,13 @@ const DataFetcher = function (nodeHelper, config) {
       });
   };
 
+  const dateToW3CString = (date) => {
+    if (date === NOW) {
+      date = new Date();
+    }
+    return dayjs(date).format();
+  };
+
   const get24HourData = async () => {
     let sensors = __sensorDataListItem?.sensors;
 
@@ -327,12 +348,15 @@ const DataFetcher = function (nodeHelper, config) {
           timeout: timeout,
           params: {
             sensorid: id,
-            start: config.startTime,
+            start: dateToW3CString(config.startTime),
             sensorname: propVals.typ,
-            avgTime: __sensorDataListItem.avgTime ?? config.avgTime ?? 60,
+            avgTime:
+              __sensorDataListItem.avgTime ??
+              config.avgTime ??
+              DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: 1
+            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? 1
           }
         })
       );
@@ -381,12 +405,15 @@ const DataFetcher = function (nodeHelper, config) {
           timeout: timeout,
           params: {
             sensorid: id,
-            start: config.startTime,
+            start: dateToW3CString(config.startTime),
             sensorname: propVals.typ,
-            avgTime: 60,
+            avgTime:
+              __sensorDataListItem.avgTime ??
+              config.avgTime ??
+              DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: 1
+            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? 1
           }
         })
       );
@@ -435,12 +462,15 @@ const DataFetcher = function (nodeHelper, config) {
           timeout: timeout,
           params: {
             sensorid: id,
-            start: config.startTime,
+            start: dateToW3CString(config.startTime),
             sensorname: propVals.typ,
-            avgTime: 60,
+            avgTime:
+              __sensorDataListItem.avgTime ??
+              config.avgTime ??
+              DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: 48
+            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? 48
           }
         })
       );
@@ -476,6 +506,11 @@ const DataFetcher = function (nodeHelper, config) {
   };
 
   const getDayChartDataMinMaxAvg = (id) => {
+    __minVals[id] = {};
+    __maxVals[id] = {};
+    __avg48Vals[id] = {};
+    __latestVals[id] = {};
+
     let radiation = __chartData.day[id]?.radiation;
     if (radiation?.values.length) {
       let values = __chartData.day[id].radiation.values;

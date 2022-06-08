@@ -29,8 +29,6 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function (notification, payload) {
     if (!payload.config) return;
 
-    console.log('###########', notification, payload)
-
     const fetcher = this.getFetcher(payload.config);
 
     switch (notification) {
@@ -46,8 +44,8 @@ module.exports = NodeHelper.create({
       case "GET_RANDOM_SENSOR_LIST_ITEM":
         fetcher.getSensorDataRandom();
         break;
-      case "UPDATE_SENSOR_LIST_ITEM":
-        fetcher.getSensorData();
+      case "UPDATE_CONFIG":
+        fetcher.updateConfig(payload.config);
         break;
       case "SUSPEND":
         fetcher.suspend();

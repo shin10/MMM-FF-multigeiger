@@ -13,7 +13,7 @@ Module.register("MMM-FF-multigeiger", {
       {
         description: "Current Radiation",
         weight: 1,
-        type: "24hours",
+        type: "day",
         layout: "list-horizontal",
         showAddress: false,
         showGraph: true,
@@ -31,7 +31,7 @@ Module.register("MMM-FF-multigeiger", {
       {
         description: "Current Radiation",
         weight: 1,
-        type: "24hours",
+        type: "day",
         layout: "list-horizontal",
         showAddress: true,
         showGraph: false,
@@ -49,7 +49,7 @@ Module.register("MMM-FF-multigeiger", {
       {
         description: "Radiation Augsburg",
         weight: 1,
-        type: "24hours",
+        type: "day",
         layout: "charts",
         showAddress: true,
         showGraph: true,
@@ -75,6 +75,13 @@ Module.register("MMM-FF-multigeiger", {
     }
   },
 
+  NOW: "now",
+  DAY: "day",
+  WEEK: "week",
+  MONTH: "month",
+  FORWARDS: "forwards",
+  BACKWARDS: "backwards",
+
   init: function () {
     this.sensorListConfig = null;
     this.avgs = null;
@@ -88,6 +95,7 @@ Module.register("MMM-FF-multigeiger", {
   start: function () {
     Log.info("Starting module: " + this.name);
     this.config.moduleId = this.identifier;
+    this.config.sensorList.forEach((_, idx) => (_.__id = idx));
     this.setStartTime();
     this.sendSocketNotification("GET_INITIAL_SENSOR_DATA", {
       config: this.config
@@ -107,10 +115,36 @@ Module.register("MMM-FF-multigeiger", {
 
   getHeader: function () {
     if (!this.config.showTitle) return null;
-    if (!this.avgs) return this.config.header;
-    return `${this.config.header} ${this.translate(
-      this.sensorListConfig?.type ?? this.config.type ?? ""
-    )}`;
+    // if (!this.avgs) return this.config.header;
+
+    const type = this.sensorListConfig?.type ?? this.config.type;
+    let TYPE = (
+      this.sensorListConfig?.type ??
+      this.config.type ??
+      ""
+    ).toUpperCase();
+
+    if (this.config?.startTime === this.NOW) {
+      return `${this.config.header}${
+        type ? " - " + this.translate("CURRENT_" + TYPE) : ""
+      }`;
+    }
+
+    const end = d3.timeFormat(this.translate("HEADER_DATE_FORMAT_END"))(
+      this.config?.startTime
+    );
+
+    if (type === this.DAY) {
+      return `${this.config.header} - ${this.translate(TYPE)} (${end})`;
+    }
+
+    const begin = d3.timeFormat(this.translate("HEADER_DATE_FORMAT_BEGIN"))(
+      this.getFirstDayOfCurrentDateRange()
+    );
+
+    return `${this.config.header} - ${this.translate(
+      TYPE
+    )} (${begin} - ${end})`;
   },
 
   getTemplate(layout) {
@@ -163,47 +197,77 @@ Module.register("MMM-FF-multigeiger", {
     };
   },
 
-  dateToW3CString(date) {
-    return d3
-      .timeFormat("%Y-%m-%dT%H:%M:%S%Z")(date)
-      .replace(/(\d\d)$/, ":$1");
+  getFirstDayOfCurrentDateRange() {
+    const DAY = 24 * 60 * 60 * 1000;
+    const dateRangeVals = {
+      day: 1,
+      week: 7,
+      month: 30
+    };
+
+    const rangeType =
+      this.sensorListConfig?.type ?? this.config?.type ?? this.DAY;
+
+    const date =
+      this.config.startTime === this.NOW ? new Date() : this.config.startTime;
+
+    return new Date(
+      (date?.valueOf() ?? Date.now()) - dateRangeVals[rangeType] * DAY
+    );
+  },
+
+  getLastDayOfNextDateRange() {
+    const DAY = 24 * 60 * 60 * 1000;
+    const dateRangeVals = {
+      day: 1,
+      week: 7,
+      month: 30
+    };
+
+    const rangeType =
+      this.sensorListConfig?.type ?? this.config?.type ?? this.DAY;
+
+    const date =
+      this.config.startTime === this.NOW ? new Date() : this.config.startTime;
+
+    return new Date(
+      (date?.valueOf() ?? Date.now()) + dateRangeVals[rangeType] * DAY
+    );
   },
 
   setStartTime(val) {
-    const DAY = 24 * 60 * 60 * 1000;
-    const dateRangeVals = {
-      "24hours": 1,
-      "week": 7,
-      "month": 30
-    }
     let date;
+
+    if (val === undefined) {
+      if (!this.config.startTime || this.config.startTime === this.NOW) {
+        this.config.startTime = this.NOW;
+        return;
+      }
+    }
+
+    date =
+      this.config.startTime === this.NOW ? new Date() : this.config.startTime;
+
     switch (val) {
-      case "backwards":
-        date = new Date(this.config.startTime?.valueOf() + dateRangeVals[this.config.type]);
-        date.setHours(0);
-        date.setMinutes(0);
+      case this.BACKWARDS:
+        date = this.getFirstDayOfCurrentDateRange();
+        date.setHours(24, 0, 0, -1);
         break;
-      case "forward":
-        date = new Date(this.config.startTime?.valueOf() + dateRangeVals[this.config.type]);
+      case this.FORWARDS:
+        date = this.getLastDayOfNextDateRange();
+        date.setHours(24, 0, 0, -1);
         if (date.valueOf() > Date.now()) {
-          date = new Date();
-        } else {
-          date.setHours(0);
-          date.setMinutes(0);
+          this.config.startTime = this.NOW;
+          return;
         }
         break;
-      case "now":
-        date = new Date();
-        break;
+      case this.NOW:
+        this.config.startTime = this.NOW;
+        return;
       default:
-        if (val !== undefined) {
-          date = val;
-        } else {
-          date = new Date()
-        }
         break;
     }
-    this.config.startTime = this.dateToW3CString(date);
+    this.config.startTime = date;
   },
 
   toggleUnitIntervalFunction() {
@@ -338,20 +402,23 @@ Module.register("MMM-FF-multigeiger", {
     setTimeout(() => {
       const sensors = this.sensorListConfig.sensors;
 
-      const xMin = d3.min(
-        sensors
-          .map((sensor) => this.chartData.day[sensor.id] ?? [])
-          .map((_) =>
-            d3.min(_?.radiation?.values ?? [], (_) => new Date(_._id))
-          )
-      );
-      const xMax = d3.max(
-        sensors
-          .map((sensor) => this.chartData.day[sensor.id] ?? [])
-          .map((_) =>
-            d3.max(_?.radiation?.values ?? [], (_) => new Date(_._id))
-          )
-      );
+      const xMin = this.getFirstDayOfCurrentDateRange();
+      // d3.min(
+      //   sensors
+      //     .map((sensor) => this.chartData.day[sensor.id] ?? [])
+      //     .map((_) =>
+      //       d3.min(_?.radiation?.values ?? [], (_) => new Date(_._id))
+      //     )
+      // );
+      const xMax =
+        this.config.startTime === this.NOW ? new Date() : this.config.startTime;
+      // d3.max(
+      //   sensors
+      //     .map((sensor) => this.chartData.day[sensor.id] ?? [])
+      //     .map((_) =>
+      //       d3.max(_?.radiation?.values ?? [], (_) => new Date(_._id))
+      //     )
+      // );
 
       const yMin = 0; //
       // d3.min(
@@ -406,7 +473,12 @@ Module.register("MMM-FF-multigeiger", {
       const yFormat = 10;
       const xAxis = d3
         .axisBottom(xScale)
-        .ticks(width / 80, d3.timeFormat("%H:%M"))
+        .ticks(
+          width / 80,
+          (this.sensorListConfig.type ?? this.config.type) === this.DAY
+            ? d3.timeFormat("%H:%M")
+            : null
+        )
         .tickSizeOuter(0);
       const yAxis = d3.axisLeft(yScale).ticks(height / 60, yFormat);
 
@@ -429,24 +501,11 @@ Module.register("MMM-FF-multigeiger", {
             .text("µSv/h")
         );
 
-      const line = d3
-        .line()
-        .curve(d3.curveLinear)
-        .x(function (d) {
-          return x(d._id);
-        })
-        .y(function (d) {
-          return y(d.uSvphAvg);
-        });
-
       const chartColors = this.chartColorFn(this.sensorListConfig);
 
-      const path = svg
+      svg
         .append("g")
         .attr("fill", "none")
-        .attr("stroke", "#f00")
-        .attr("stroke-width", 2)
-        .attr("stroke-opacity", 1)
         .selectAll("path")
         .data(data)
         .join("path")
@@ -457,9 +516,6 @@ Module.register("MMM-FF-multigeiger", {
             enter
               .append("path")
               .attr("fill", "none")
-              .attr("stroke", "#0f0")
-              .attr("stroke-width", 1.5)
-
               .attr("d", (i, I) => {
                 return d3
                   .line()
@@ -467,7 +523,7 @@ Module.register("MMM-FF-multigeiger", {
                     return x(d._id);
                   })
                   .y(function (d) {
-                    return y(0);
+                    return d.uSvphAvg ? y(0) : null;
                   })(i);
               })
               .style("opacity", 0)
@@ -485,13 +541,16 @@ Module.register("MMM-FF-multigeiger", {
                     return x(d._id);
                   })
                   .y(function (d) {
-                    return y(0);
+                    return d.uSvphAvg ? y(0) : null;
                   })(i);
               })
+              .style("opacity", 0)
               .transition()
               .delay((d, i, a) => {
                 return i * 125;
               })
+              .duration(1000)
+              .style("opacity", 1)
               .duration(1000)
               .attr("d", (i, I) => {
                 return d3
@@ -500,7 +559,7 @@ Module.register("MMM-FF-multigeiger", {
                     return x(d._id);
                   })
                   .y(function (d) {
-                    return y(d.uSvphAvg);
+                    return d.uSvphAvg ? y(d.uSvphAvg) : null;
                   })(i);
               })
               .selection()
@@ -598,6 +657,9 @@ Module.register("MMM-FF-multigeiger", {
               .y(function (d) {
                 return y(d.uSvphAvg);
               })
+            // .defined(function (d) {
+            //   return d.uSvphAvg !== null;
+            // })
           );
       });
     }, 1000);
@@ -616,12 +678,16 @@ Module.register("MMM-FF-multigeiger", {
     );
   },
 
+  flushSensorListConfig() {
+    this.config.sensorList[sensorListConfig.__id] = this.sensorListConfig;
+  },
+
   notificationReceived: function (notification, payload, sender) {
     if (!this.isAcceptableSender(sender)) return;
 
     this.config.events[notification]?.split(" ").forEach((e) => {
       this.setStartTime();
-      const dateRangeTypes = ["24hours", "week", "month"];
+      const dateRangeTypes = [this.DAY, this.WEEK, this.MONTH];
       const layoutTypes = ["list-vertical", "list-horizontal", "charts"];
       switch (e) {
         case "SENSOR_LIST_ITEM_PREVIOUS":
@@ -644,56 +710,92 @@ Module.register("MMM-FF-multigeiger", {
           break;
         case "SENSOR_LIST_DATE_BACKWARDS":
           if (!this.hidden) {
-            this.setStartTime("backwards");
-            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+            this.setStartTime(this.BACKWARDS);
+            this.sendSocketNotification("UPDATE_CONFIG", {
               config: this.config
             });
           }
           break;
         case "SENSOR_LIST_DATE_NOW":
           if (!this.hidden) {
-            this.setStartTime("now");
-            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+            this.setStartTime(this.NOW);
+            this.sendSocketNotification("UPDATE_CONFIG", {
               config: this.config
             });
           }
           break;
         case "SENSOR_LIST_DATE_FORWARDS":
           if (!this.hidden) {
-            this.setStartTime("forwards");
-            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+            this.setStartTime(this.FORWARDS);
+            this.sendSocketNotification("UPDATE_CONFIG", {
               config: this.config
             });
           }
           break;
         case "SENSOR_LIST_DATE_RANGE_ZOOM_IN":
           if (!this.hidden) {
-            this.config.type = dateRangeTypes[ (dateRangeTypes.length + --dateRangeTypes.indexOf(this.config.type) -1 ) % dateRangeTypes.length ];
-            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+            this.sensorListConfig.type =
+              dateRangeTypes[
+                (dateRangeTypes.length +
+                  dateRangeTypes.indexOf(
+                    this.sensorListConfig.type ?? this.config.type
+                  ) -
+                  1) %
+                  dateRangeTypes.length
+              ];
+            this.flushSensorListConfig();
+            this.sendSocketNotification("UPDATE_CONFIG", {
               config: this.config
             });
           }
           break;
         case "SENSOR_LIST_DATE_RANGE_ZOOM_OUT":
-            if (!this.hidden) {
-            this.config.type = dateRangeTypes[ (dateRangeTypes.length + dateRangeTypes.indexOf(this.config.type) +1 ) % dateRangeTypes.length ];
-            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+          if (!this.hidden) {
+            this.sensorListConfig.type =
+              dateRangeTypes[
+                (dateRangeTypes.length +
+                  dateRangeTypes.indexOf(
+                    this.sensorListConfig.type ?? this.config.type
+                  ) +
+                  1) %
+                  dateRangeTypes.length
+              ];
+            this.flushSensorListConfig();
+            this.sendSocketNotification("UPDATE_CONFIG", {
               config: this.config
             });
           }
           break;
         case "SENSOR_LIST_LAYOUT_PREVIOUS":
-            if (!this.hidden) {
-            this.config.layout = layoutTypes[ (layoutTypes.length + layoutTypes.indexOf(this.config.type) -1 ) % layoutTypes.length ];
-            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+          if (!this.hidden) {
+            this.sensorListConfig.layout =
+              layoutTypes[
+                (layoutTypes.length +
+                  layoutTypes.indexOf(
+                    this.sensorListConfig.layout ?? this.config.layout
+                  ) -
+                  1) %
+                  layoutTypes.length
+              ];
+            this.flushSensorListConfig();
+            this.sendSocketNotification("UPDATE_CONFIG", {
               config: this.config
             });
           }
           break;
         case "SENSOR_LIST_LAYOUT_NEXT":
-            if (!this.hidden) {
-            this.config.layout = layoutTypes[ (layoutTypes.length + layoutTypes.indexOf(this.config.type) +1 ) % layoutTypes.length ];
-            this.sendSocketNotification("UPDATE_SENSOR_LIST_ITEM", {
+          if (!this.hidden) {
+            this.sensorListConfig.layout =
+              layoutTypes[
+                (layoutTypes.length +
+                  layoutTypes.indexOf(
+                    this.sensorListConfig.layout ?? this.config.layout
+                  ) +
+                  1) %
+                  layoutTypes.length
+              ];
+            this.flushSensorListConfig();
+            this.sendSocketNotification("UPDATE_CONFIG", {
               config: this.config
             });
           }

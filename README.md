@@ -1,5 +1,13 @@
 ![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.gif)
 
+TODO:
+
+* ~Date "now" aktuell halten~ Stuttgart 80.6 Dresden 71.4
+* Time scale nach type
+* type change event
+* layout change event
+* README
+
 # MMM-FF-multigeiger (BETA)
 
 [![ISC License](https://img.shields.io/badge/license-ISC-blue.svg)](https://choosealicense.com/licenses/isc)
@@ -51,7 +59,7 @@ $(
       {
         description: "Current Radiation",
         weight: 1,
-        type: "24hours",
+        type: "day",
         layout: "list-horizontal",
         toggleUnitInterval: 10000,
         sensors: [
@@ -65,7 +73,7 @@ $(
       {
         description: "Current Radiation",
         weight: 1,
-        type: "24hours",
+        type: "day",
         layout: "list-horizontal",
         toggleUnitInterval: 4000,
         sensors: [

@@ -52,6 +52,8 @@
                   <span class="value-cpm">
                     {% if sensor.latestVals.cpmAvg %}
                       {{ sensor.latestVals.cpmAvg.toFixed(1) }}
+                    {% else %}
+                      <span class="sensorlist-icon-missing-data"><i class="fa fa-question"></i></span>
                     {% endif %}
                   </span>
                 {% else %}
@@ -83,6 +85,8 @@
                   <span class="value-svt">
                     {% if sensor.latestVals.uSvphAvg %}
                       {{ sensor.latestVals.uSvphAvg.toFixed(2) }}
+                    {% else %}
+                      <span class="sensorlist-icon-missing-data"><i class="fa fa-question"></i></span>
                     {% endif %}
                   </span>
                 {% else %}
@@ -101,7 +105,7 @@
       {% endfor %}
     </ul>
   {% else %}
-    <span class="loading">loading current sensor data &hellip;
+    <span class="loading">{{ "LOADING_SENSOR_DATA" | translate | safe }}
       <span class="loading-spinner">
         <i class="loading-spinner-icon fa-solid fa-radiation"></i>
       </span>

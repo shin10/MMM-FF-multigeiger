@@ -73,6 +73,11 @@
   font-size: 0.75em;
 }
 
+.MMM-FF-multigeiger .charts .sensorlist-icon-missing-data {
+  opacity: 0.25;
+  font-size: 0.75em;
+}
+
 .MMM-FF-multigeiger .charts .sensorlist-current {
   height: 2.5rem;
   font-size: 2rem;
