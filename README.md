@@ -113,7 +113,7 @@ $(
 
 ### Sensor list items
 
-The items in the sensor list define the collection of sensors. Further you can override the global properties per sensorList item to switch `layout` or data amount (`type`). The `weight` property will be used if the `SENSOR_LIST_ITEM_RANDOM` event is dispatched, or sequence is set to `random`.
+The items in the sensor list define the collection of sensors. Further you can override the config properties per sensorList item to switch `layout` or data amount (`type`). The `weight` property will be used if the `SENSOR_LIST_ITEM_RANDOM` event is dispatched, or sequence is set to `random`.
 
 ### `updateInterval` and `updateOnSuspension`
 
@@ -132,6 +132,13 @@ The following events are supported:
 - SENSOR_LIST_ITEM_PREVIOUS
 - SENSOR_LIST_ITEM_NEXT
 - SENSOR_LIST_ITEM_RANDOM
+- SENSOR_LIST_DATE_BACKWARDS
+- SENSOR_LIST_DATE_NOW
+- SENSOR_LIST_DATE_FORWARDS
+- SENSOR_LIST_DATE_RANGE_ZOOM_IN
+- SENSOR_LIST_DATE_RANGE_ZOOM_OUT
+- SENSOR_LIST_LAYOUT_PREVIOUS
+- SENSOR_LIST_LAYOUT_NEXT
 
 For ease of use they can be remapped in the `events` object to custom strings. Refer to the example config above.
 

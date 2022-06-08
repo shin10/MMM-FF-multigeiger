@@ -219,9 +219,11 @@ const DataFetcher = function (nodeHelper, config) {
   this.getSensorDataRandom = () => fetchData(getSensorListItemRandom());
   this.updateConfig = (_config) => {
     config = _config;
-    __sensorDataListItem = config.sensorList.filter(
-      (_) => __sensorDataListItem.__id === _.__id
-    )[0];
+    if (__sensorDataListItem) {
+      __sensorDataListItem = config.sensorList.filter(
+        (_) => __sensorDataListItem.__id === _.__id
+      )[0];
+    }
     fetchData(__sensorDataListItem);
   };
 

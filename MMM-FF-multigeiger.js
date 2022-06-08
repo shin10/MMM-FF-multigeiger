@@ -403,16 +403,10 @@ Module.register("MMM-FF-multigeiger", {
       const sensors = this.sensorListConfig.sensors;
 
       const xMin = this.getFirstDayOfCurrentDateRange();
-      // d3.min(
-      //   sensors
-      //     .map((sensor) => this.chartData.day[sensor.id] ?? [])
-      //     .map((_) =>
-      //       d3.min(_?.radiation?.values ?? [], (_) => new Date(_._id))
-      //     )
-      // );
+
       const xMax =
         this.config.startTime === this.NOW ? new Date() : this.config.startTime;
-      // d3.max(
+      // const xMax = d3.max(
       //   sensors
       //     .map((sensor) => this.chartData.day[sensor.id] ?? [])
       //     .map((_) =>
@@ -452,10 +446,12 @@ Module.register("MMM-FF-multigeiger", {
       const data = sensors
         .map((sensor) => this.chartData.day[sensor.id] ?? [])
         .map((d) =>
-          d?.radiation?.values.map((v) => {
-            v._id = v._id;
-            return v;
-          })
+          d?.radiation?.values
+            .map((_) => {
+              _._id = new Date(_._id);
+              return _;
+            })
+            .filter((_) => _._id.valueOf() >= xMin.valueOf())
         );
 
       if (!data) return;
@@ -679,7 +675,7 @@ Module.register("MMM-FF-multigeiger", {
   },
 
   flushSensorListConfig() {
-    this.config.sensorList[sensorListConfig.__id] = this.sensorListConfig;
+    this.config.sensorList[this.sensorListConfig.__id] = this.sensorListConfig;
   },
 
   notificationReceived: function (notification, payload, sender) {
