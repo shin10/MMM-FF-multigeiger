@@ -434,8 +434,8 @@ Module.register("MMM-FF-multigeiger", {
       const marginRight = 50;
       const marginBottom = 50;
       const marginLeft = 50;
-      const width = graphWrapper.node().getBoundingClientRect().width;
-      const height = graphWrapper.node().getBoundingClientRect().height;
+      const width = graphWrapper.node().clientWidth;
+      const height = graphWrapper.node().clientHeight;
       const xDomain = [xMin, xMax];
       const yDomain = [yMin, yMax];
       const xRange = [marginLeft, width - marginRight];
