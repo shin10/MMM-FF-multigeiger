@@ -57,6 +57,12 @@
         height: 50px;
       }
 
+      .chart-line {
+        fill: none;
+        stroke: url(#line-gradient);
+        stroke-width: 1;
+      }
+      
       &.disabled {
         opacity: 0.3;
       }

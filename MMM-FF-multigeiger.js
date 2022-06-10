@@ -399,7 +399,7 @@ Module.register("MMM-FF-multigeiger", {
   },
 
   renderChartGraphs() {
-    setTimeout(() => {
+    setTimeout(async () => {
       const sensors = this.sensorListConfig.sensors;
 
       const xMin = this.getFirstDayOfCurrentDateRange();
@@ -456,6 +456,40 @@ Module.register("MMM-FF-multigeiger", {
 
       if (!data) return;
 
+      const localFormat = this.translate('localFormats');
+
+      var ua = d3.timeFormatLocale(localFormat);
+      d3.timeFormatDefaultLocale(localFormat);
+
+      const formatMillisecond = d3.timeFormat(".%L"),
+        formatSecond = d3.timeFormat(":%S"),
+        formatMinute = d3.timeFormat("%H:%M"),
+        formatHour = d3.timeFormat("%H:%M"),
+        formatDay = d3.timeFormat("%a %d."),
+        formatWeek = d3.timeFormat("%b %d."),
+        formatMonth = d3.timeFormat("%B"),
+        formatYear = d3.timeFormat("%Y");
+
+      function multiFormat(date) {
+        return (
+          d3.timeSecond(date) < date
+            ? formatMillisecond
+            : d3.timeMinute(date) < date
+            ? formatSecond
+            : d3.timeHour(date) < date
+            ? formatMinute
+            : d3.timeDay(date) < date
+            ? formatHour
+            : d3.timeMonth(date) < date
+            ? d3.timeWeek(date) < date
+              ? formatDay
+              : formatWeek
+            : d3.timeYear(date) < date
+            ? formatMonth
+            : formatYear
+        )(date);
+      }
+
       graphWrapper.select("svg").remove();
 
       const svg = graphWrapper
@@ -467,14 +501,10 @@ Module.register("MMM-FF-multigeiger", {
       const xScale = d3.scaleTime(xDomain, xRange);
       const yScale = d3.scaleLinear(yDomain, yRange);
       const yFormat = 10;
+
       const xAxis = d3
         .axisBottom(xScale)
-        .ticks(
-          width / 80,
-          (this.sensorListConfig.type ?? this.config.type) === this.DAY
-            ? d3.timeFormat("%H:%M")
-            : null
-        )
+        .tickFormat((d) => multiFormat(d))
         .tickSizeOuter(0);
       const yAxis = d3.axisLeft(yScale).ticks(height / 60, yFormat);
 
@@ -505,13 +535,13 @@ Module.register("MMM-FF-multigeiger", {
         .selectAll("path")
         .data(data)
         .join("path")
-        .attr("stroke-width", 2)
+        .attr("stroke-width", 1)
         .attr("stroke", (i, I) => chartColors(I))
         .join(
           (enter) =>
             enter
               .append("path")
-              .attr("fill", "none")
+              .attr("class", "chart-line")
               .attr("d", (i, I) => {
                 return d3
                   .line()
@@ -639,10 +669,8 @@ Module.register("MMM-FF-multigeiger", {
 
         svg
           .append("path")
+          .attr("class", "chart-line")
           .datum(data)
-          .attr("fill", "none")
-          .attr("stroke", "url(#line-gradient)")
-          .attr("stroke-width", 2)
           .attr(
             "d",
             d3

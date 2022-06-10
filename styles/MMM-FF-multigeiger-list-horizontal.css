@@ -89,6 +89,12 @@
   height: 50px;
 }
 
+.MMM-FF-multigeiger .list-horizontal .sensorlist-item .chart-line {
+  fill: none;
+  stroke: url(#line-gradient);
+  stroke-width: 1;
+}
+
 .MMM-FF-multigeiger .list-horizontal .sensorlist-item.disabled {
   opacity: 0.3;
 }

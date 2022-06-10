@@ -50,6 +50,12 @@
         top: 0;
         right: 0;
       }
+      
+      .chart-line {
+        fill: none;
+        stroke: url(#line-gradient);
+        stroke-width: 1;
+      }
 
       &.disabled {
         opacity: 0.3;

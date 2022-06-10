@@ -32,6 +32,11 @@
   height: 100%;
 }
 
+.MMM-FF-multigeiger .charts .graph-wrapper .chart-line {
+  fill: none;
+  stroke-width: 1;
+}
+
 .MMM-FF-multigeiger .charts .sensorlist-item {
   margin: 1rem 0.5rem;
   padding: 0;
@@ -55,9 +60,9 @@
 
 .MMM-FF-multigeiger .charts .sensorlist-item .chart-color {
   display: inline-block;
-  width: .7em;
-  height: .7em;
-  border-radius: .2em;
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 0.2em;
 }
 
 .MMM-FF-multigeiger .charts .sensorlist-id {
