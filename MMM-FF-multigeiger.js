@@ -366,7 +366,7 @@ Module.register("MMM-FF-multigeiger", {
     for (let type in data) {
       const typeData = data[type];
       for (let sensorId in typeData) {
-        vals = typeData[sensorId].radiation?.values;
+        vals = typeData[sensorId]?.radiation?.values;
         vals?.forEach((v, i) => {
           vals[i]._id = new Date(v._id);
         });
@@ -447,7 +447,7 @@ Module.register("MMM-FF-multigeiger", {
         .map((sensor) => this.chartData.day[sensor.id] ?? [])
         .map((d) =>
           d?.radiation?.values
-            .map((_) => {
+            ?.map((_) => {
               _._id = new Date(_._id);
               return _;
             })
@@ -456,7 +456,7 @@ Module.register("MMM-FF-multigeiger", {
 
       if (!data) return;
 
-      const localFormat = this.translate('localFormats');
+      const localFormat = this.translate("localFormats");
 
       var ua = d3.timeFormatLocale(localFormat);
       d3.timeFormatDefaultLocale(localFormat);
@@ -630,10 +630,12 @@ Module.register("MMM-FF-multigeiger", {
         );
         if (!listElement.node()) return;
 
-        const data = this.chartData.day[sensor.id].radiation.values.map((_) => {
-          _._id = new Date(_._id);
-          return _;
-        });
+        const data = this.chartData.day[sensor.id]?.radiation?.values?.map(
+          (_) => {
+            _._id = new Date(_._id);
+            return _;
+          }
+        );
         if (!data) return;
 
         listElement.select("svg").remove();
