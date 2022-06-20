@@ -148,13 +148,16 @@ Module.register("MMM-FF-multigeiger", {
   },
 
   getTemplate(layout) {
-    layout = layout || this.sensorListConfig?.layout;
+    layout =
+      layout ||
+      (this.sensorListConfig?.layout ??
+        this.config.layout ??
+        "list-horizontal");
 
     if (this.errors?.length) {
       layout = "error";
     }
-
-    if (!layout) return "templates/list-horizontal.njk";
+    
     return `templates/${layout}.njk`;
   },
 
@@ -315,11 +318,12 @@ Module.register("MMM-FF-multigeiger", {
           if (err) {
             Log.error("Failed to render data", err);
           }
-          this.updateDom(this.config.animationSpeed);
+          // this.updateDom(this.config.animationSpeed);
 
           this.toggleUnitIntervalState = false;
+          if (this.toggleUnitInterval) clearTimeout(this.toggleUnitInterval);
           let toggleUnitIntervalEnabled =
-            this.sensorListConfig.toggleUnitInterval ??
+            this.sensorListConfig?.toggleUnitInterval ??
             this.config.toggleUnitInterval ??
             false;
           if (toggleUnitIntervalEnabled) this.toggleUnitIntervalFunction();
@@ -352,7 +356,9 @@ Module.register("MMM-FF-multigeiger", {
         this.avg48Vals = payload.avg48Vals;
         this.latestVals = payload.latestVals;
         await this.renderSensorData(
-          this.sensorListConfig?.layout ?? "list-horizontal"
+          this.sensorListConfig?.layout ??
+            this.config?.layout ??
+            "list-horizontal"
         );
         this.renderGraphs();
         break;
@@ -361,12 +367,13 @@ Module.register("MMM-FF-multigeiger", {
     }
     this.updateDom(this.config.animationSpeed);
   },
+
   transformChartData(data) {
     // transform Date strings to Date objects
     for (let type in data) {
       const typeData = data[type];
       for (let sensorId in typeData) {
-        vals = typeData[sensorId]?.radiation?.values;
+        let vals = typeData[sensorId]?.radiation?.values;
         vals?.forEach((v, i) => {
           vals[i]._id = new Date(v._id);
         });
@@ -376,8 +383,9 @@ Module.register("MMM-FF-multigeiger", {
   },
 
   renderGraphs() {
-    if (this.sensorListConfig.layout === "charts")
+    if ((this.sensorListConfig.layout ?? this.config.layout) === "charts")
       return this.renderChartGraphs();
+
     if (this.sensorListConfig.showGraph == false) return;
     this.renderListGraphs();
   },
@@ -425,7 +433,7 @@ Module.register("MMM-FF-multigeiger", {
         sensors
           .map((sensor) => this.chartData.day[sensor.id] ?? [])
           .map((_) => d3.max(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
-      );
+      ) ?? 0;
 
       const graphWrapper = d3.select(`#${this.identifier} .graph-wrapper`);
       if (!graphWrapper.node()) return;
@@ -447,10 +455,10 @@ Module.register("MMM-FF-multigeiger", {
         .map((sensor) => this.chartData.day[sensor.id] ?? [])
         .map((d) =>
           d?.radiation?.values
-            ?.map((_) => {
-              _._id = new Date(_._id);
-              return _;
-            })
+            // ?.map((_) => {
+            //   _._id = new Date(_._id);
+            //   return _;
+            // })
             .filter((_) => _._id.valueOf() >= xMin.valueOf())
         );
 
@@ -549,7 +557,7 @@ Module.register("MMM-FF-multigeiger", {
                     return x(d._id);
                   })
                   .y(function (d) {
-                    return d.uSvphAvg ? y(0) : null;
+                    return y(0);
                   })(i);
               })
               .style("opacity", 0)
@@ -567,7 +575,7 @@ Module.register("MMM-FF-multigeiger", {
                     return x(d._id);
                   })
                   .y(function (d) {
-                    return d.uSvphAvg ? y(0) : null;
+                    return y(0);
                   })(i);
               })
               .style("opacity", 0)
@@ -585,39 +593,33 @@ Module.register("MMM-FF-multigeiger", {
                     return x(d._id);
                   })
                   .y(function (d) {
-                    return d.uSvphAvg ? y(d.uSvphAvg) : null;
+                    return y(d.uSvphAvg ?? 0);
                   })(i);
               })
               .selection()
         );
-    }, 1000);
+    }, this.config.animationSpeed ?? 1000);
   },
 
   renderListGraphs() {
     setTimeout(() => {
       const sensors = this.sensorListConfig.sensors;
 
-      const xMin = d3.min(
-        sensors
-          .map((sensor) => this.chartData.day[sensor.id] ?? [])
-          .map((_) => d3.min(_?.radiation?.values ?? [], (_) => _._id))
-      );
-      const xMax = d3.max(
-        sensors
-          .map((sensor) => this.chartData.day[sensor.id] ?? [])
-          .map((_) => d3.max(_?.radiation?.values ?? [], (_) => _._id))
-      );
+      const xMin = this.getFirstDayOfCurrentDateRange();
+
+      const xMax =
+        this.config.startTime === this.NOW ? new Date() : this.config.startTime;
 
       const yMin = d3.min(
         sensors
           .map((sensor) => this.chartData.day[sensor.id] ?? [])
           .map((_) => d3.min(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
-      );
+      ) ?? 0;
       const yMax = d3.max(
         sensors
           .map((sensor) => this.chartData.day[sensor.id] ?? [])
           .map((_) => d3.max(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
-      );
+      ) ?? 0;
 
       const width = 100;
       const height = 100;
@@ -630,12 +632,13 @@ Module.register("MMM-FF-multigeiger", {
         );
         if (!listElement.node()) return;
 
-        const data = this.chartData.day[sensor.id]?.radiation?.values?.map(
-          (_) => {
-            _._id = new Date(_._id);
-            return _;
-          }
-        );
+        const data = this.chartData.day[sensor.id]?.radiation?.values
+        // ?.map(
+        //   (_) => {
+        //     _._id = new Date(_._id);
+        //     return _;
+        //   }
+        // );
         if (!data) return;
 
         listElement.select("svg").remove();
@@ -681,14 +684,11 @@ Module.register("MMM-FF-multigeiger", {
                 return x(d._id);
               })
               .y(function (d) {
-                return y(d.uSvphAvg);
+                return y(d.uSvphAvg ?? 0);
               })
-            // .defined(function (d) {
-            //   return d.uSvphAvg !== null;
-            // })
           );
       });
-    }, 1000);
+    }, this.config.animationSpeed ?? 1000);
   },
 
   isAcceptableSender(sender) {
@@ -760,7 +760,7 @@ Module.register("MMM-FF-multigeiger", {
           break;
         case "SENSOR_LIST_DATE_RANGE_ZOOM_IN":
           if (!this.hidden) {
-            this.sensorListConfig.type =
+            this.config.type = this.sensorListConfig.type =
               dateRangeTypes[
                 (dateRangeTypes.length +
                   dateRangeTypes.indexOf(
@@ -777,7 +777,7 @@ Module.register("MMM-FF-multigeiger", {
           break;
         case "SENSOR_LIST_DATE_RANGE_ZOOM_OUT":
           if (!this.hidden) {
-            this.sensorListConfig.type =
+            this.config.type = this.sensorListConfig.type =
               dateRangeTypes[
                 (dateRangeTypes.length +
                   dateRangeTypes.indexOf(
@@ -794,7 +794,7 @@ Module.register("MMM-FF-multigeiger", {
           break;
         case "SENSOR_LIST_LAYOUT_PREVIOUS":
           if (!this.hidden) {
-            this.sensorListConfig.layout =
+            this.config.layout = this.sensorListConfig.layout =
               layoutTypes[
                 (layoutTypes.length +
                   layoutTypes.indexOf(
@@ -811,7 +811,7 @@ Module.register("MMM-FF-multigeiger", {
           break;
         case "SENSOR_LIST_LAYOUT_NEXT":
           if (!this.hidden) {
-            this.sensorListConfig.layout =
+            this.config.layout = this.sensorListConfig.layout =
               layoutTypes[
                 (layoutTypes.length +
                   layoutTypes.indexOf(

@@ -110,7 +110,7 @@ const DataFetcher = function (nodeHelper, config) {
         timeout: timeout
       })
       .then((response) => {
-        console.log("multigeiger server ok");
+        console.log("citysensor server seems ok");
       })
       .catch((error) => {
         console.error(error.response);
@@ -141,7 +141,7 @@ const DataFetcher = function (nodeHelper, config) {
           processAVGs();
           __avgsFiltered = filterAVGs(
             __avgs,
-            __sensorDataListItem.sensors.map((_) => _.id)
+            __sensorDataListItem?.sensors.map((_) => _.id)
           );
         });
     }
@@ -185,6 +185,7 @@ const DataFetcher = function (nodeHelper, config) {
   };
 
   const fetchData = async (sensorDataListItem) => {
+    stopInterval(config);
     showPreloader();
     __sensorDataListItem = sensorDataListItem;
     __avgs = __avgsFiltered = null;
@@ -500,7 +501,6 @@ const DataFetcher = function (nodeHelper, config) {
         })
       )
       .catch((error) => {
-        console.error(error);
         __errors.push(error);
         updateFrontendData();
         serverTest();
@@ -514,7 +514,7 @@ const DataFetcher = function (nodeHelper, config) {
     __latestVals[id] = {};
 
     let radiation = __chartData.day[id]?.radiation;
-    if (radiation?.values.length) {
+    if (radiation?.values?.length) {
       let values = __chartData.day[id].radiation.values;
 
       // get min vals

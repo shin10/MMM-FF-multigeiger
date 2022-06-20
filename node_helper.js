@@ -28,7 +28,6 @@ module.exports = NodeHelper.create({
 
   socketNotificationReceived: function (notification, payload) {
     if (!payload.config) return;
-
     const fetcher = this.getFetcher(payload.config);
 
     switch (notification) {
