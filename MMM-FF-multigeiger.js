@@ -7,71 +7,31 @@
 
 Module.register("MMM-FF-multigeiger", {
   defaults: {
-    header: "Multigeiger",
     baseURL: "https://multigeiger.citysensor.de/",
-    sensorList: [
-      {
-        description: "Current Radiation",
-        weight: 1,
-        type: "day",
-        layout: "list-horizontal",
-        showAddress: false,
-        showGraph: true,
-        showInstallationSite: true,
-        showRegion: true,
-        showSensorId: true,
-        showMinMax: true,
-        sensors: [
-          { id: 71364, description: "Utrecht" },
-          { id: 71180, description: "Leipzig" },
-          { id: 70784, description: "Zürich" },
-          { id: 72366, description: "Augsburg" }
-        ]
-      },
-      {
-        description: "Current Radiation",
-        weight: 1,
-        type: "day",
-        layout: "list-horizontal",
-        showAddress: true,
-        showGraph: false,
-        showInstallationSite: true,
-        showRegion: true,
-        showSensorId: true,
-        showMinMax: true,
-        sensors: [
-          { id: 31122, description: "Stuttgart" },
-          { id: 59328, description: "Bern" },
-          { id: 70948, description: "Nürnberg" },
-          { id: 65059, description: "Hamburg" }
-        ]
-      },
-      {
-        description: "Radiation Augsburg",
-        weight: 1,
-        type: "day",
-        layout: "charts",
-        showAddress: true,
-        showGraph: true,
-        showInstallationSite: true,
-        showRegion: true,
-        showSensorId: true,
-        showMinMax: true,
-        sensors: [{ id: 72366, description: "Augsburg" }]
-      }
-    ],
-    layout: "list-horizontal",
-    chartColors: "default", // "default", color or array of colors ["#f00", "#0f0", "#00f" ...]
-    sequence: "default", // null, 'random', 'default', 'reverse'
-    updateOnSuspension: null, // null, false or true
-    updateInterval: 15 * 60 * 1000,
+    header: "Multigeiger",
     showTitle: true,
+    sequence: "default",
+    updateInterval: 15 * 60 * 1000,
+    updateOnSuspension: null,
     animationSpeed: 1000,
+    layout: "list-horizontal",
+    type: "day",
+    chartColors: "default",
     toggleUnitInterval: 10 * 1000,
+    sensorList: [],
     events: {
+      SENSOR_LIST_ITEM_RANDOM: "SENSOR_LIST_ITEM_RANDOM",
       SENSOR_LIST_ITEM_PREVIOUS: "SENSOR_LIST_ITEM_PREVIOUS",
       SENSOR_LIST_ITEM_NEXT: "SENSOR_LIST_ITEM_NEXT",
-      SENSOR_LIST_ITEM_RANDOM: "SENSOR_LIST_ITEM_RANDOM"
+
+      SENSOR_LIST_DATE_BACKWARDS: "SENSOR_LIST_DATE_BACKWARDS",
+      SENSOR_LIST_DATE_FORWARDS: "SENSOR_LIST_DATE_FORWARDS",
+      SENSOR_LIST_DATE_NOW: "SENSOR_LIST_DATE_NOW",
+      SENSOR_LIST_DATE_RANGE_ZOOM_IN: "SENSOR_LIST_DATE_RANGE_ZOOM_IN",
+      SENSOR_LIST_DATE_RANGE_ZOOM_OUT: "SENSOR_LIST_DATE_RANGE_ZOOM_OUT",
+
+      SENSOR_LIST_LAYOUT_PREVIOUS: "SENSOR_LIST_LAYOUT_PREVIOUS",
+      SENSOR_LIST_LAYOUT_NEXT: "SENSOR_LIST_LAYOUT_NEXT"
     }
   },
 
@@ -114,8 +74,8 @@ Module.register("MMM-FF-multigeiger", {
   },
 
   getHeader: function () {
-    if (!this.config.showTitle) return null;
-    // if (!this.avgs) return this.config.header;
+    if (!this.config.showTitle || this.sensorListConfig?.showTitle === false)
+      return null;
 
     const type = this.sensorListConfig?.type ?? this.config.type;
     let TYPE = (
@@ -125,7 +85,7 @@ Module.register("MMM-FF-multigeiger", {
     ).toUpperCase();
 
     if (this.config?.startTime === this.NOW) {
-      return `${this.config.header}${
+      return `${this.sensorListConfig?.header ?? this.config.header}${
         type ? " - " + this.translate("CURRENT_" + TYPE) : ""
       }`;
     }
@@ -157,7 +117,7 @@ Module.register("MMM-FF-multigeiger", {
     if (this.errors?.length) {
       layout = "error";
     }
-    
+
     return `templates/${layout}.njk`;
   },
 
@@ -170,11 +130,7 @@ Module.register("MMM-FF-multigeiger", {
       sensor.properties = this.sensorProperties[sensor.id];
       dataComplete = dataComplete && sensor.avg && sensor.properties;
 
-      sensor.chartData = {
-        day: this.chartData.day[sensor.id],
-        week: this.chartData.week[sensor.id],
-        month: this.chartData.month[sensor.id]
-      };
+      sensor.chartData = this.chartData[sensor.id];
       sensor.minVals = this.minVals[sensor.id];
       sensor.maxVals = this.maxVals[sensor.id];
       sensor.avg48Vals = this.avg48Vals[sensor.id];
@@ -318,7 +274,6 @@ Module.register("MMM-FF-multigeiger", {
           if (err) {
             Log.error("Failed to render data", err);
           }
-          // this.updateDom(this.config.animationSpeed);
 
           this.toggleUnitIntervalState = false;
           if (this.toggleUnitInterval) clearTimeout(this.toggleUnitInterval);
@@ -370,14 +325,11 @@ Module.register("MMM-FF-multigeiger", {
 
   transformChartData(data) {
     // transform Date strings to Date objects
-    for (let type in data) {
-      const typeData = data[type];
-      for (let sensorId in typeData) {
-        let vals = typeData[sensorId]?.radiation?.values;
-        vals?.forEach((v, i) => {
-          vals[i]._id = new Date(v._id);
-        });
-      }
+    for (let sensorId in data) {
+      let vals = data[sensorId].radiation?.values;
+      vals?.forEach((v, i) => {
+        vals[i]._id = new Date(v._id);
+      });
     }
     return data;
   },
@@ -414,26 +366,15 @@ Module.register("MMM-FF-multigeiger", {
 
       const xMax =
         this.config.startTime === this.NOW ? new Date() : this.config.startTime;
-      // const xMax = d3.max(
-      //   sensors
-      //     .map((sensor) => this.chartData.day[sensor.id] ?? [])
-      //     .map((_) =>
-      //       d3.max(_?.radiation?.values ?? [], (_) => new Date(_._id))
-      //     )
-      // );
 
-      const yMin = 0; //
-      // d3.min(
-      //   sensors
-      //     .map((sensor) => this.chartData.day[sensor.id] ?? [])
-      //     .map((_) => d3.min(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
-      // );
+      const yMin = 0;
 
-      const yMax = d3.max(
-        sensors
-          .map((sensor) => this.chartData.day[sensor.id] ?? [])
-          .map((_) => d3.max(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
-      ) ?? 0;
+      const yMax =
+        d3.max(
+          sensors
+            .map((sensor) => this.chartData[sensor.id] ?? [])
+            .map((_) => d3.max(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
+        ) ?? 0;
 
       const graphWrapper = d3.select(`#${this.identifier} .graph-wrapper`);
       if (!graphWrapper.node()) return;
@@ -452,14 +393,9 @@ Module.register("MMM-FF-multigeiger", {
       const y = d3.scaleLinear().domain(yDomain).range(yRange);
 
       const data = sensors
-        .map((sensor) => this.chartData.day[sensor.id] ?? [])
+        .map((sensor) => this.chartData[sensor.id] ?? [])
         .map((d) =>
-          d?.radiation?.values
-            // ?.map((_) => {
-            //   _._id = new Date(_._id);
-            //   return _;
-            // })
-            .filter((_) => _._id.valueOf() >= xMin.valueOf())
+          d?.radiation?.values.filter((_) => _._id.valueOf() >= xMin.valueOf())
         );
 
       if (!data) return;
@@ -519,12 +455,14 @@ Module.register("MMM-FF-multigeiger", {
       svg
         .append("g")
         .attr("transform", `translate(0,${height - marginBottom})`)
-        .call(xAxis);
+        .call(xAxis)
+        .attr("class", "chart-scale chart-scale-x");
 
       svg
         .append("g")
         .attr("transform", `translate(${marginLeft},0)`)
         .call(yAxis)
+        .attr("class", "chart-scale chart-scale-y")
         .call((g) =>
           g
             .append("text")
@@ -610,16 +548,18 @@ Module.register("MMM-FF-multigeiger", {
       const xMax =
         this.config.startTime === this.NOW ? new Date() : this.config.startTime;
 
-      const yMin = d3.min(
-        sensors
-          .map((sensor) => this.chartData.day[sensor.id] ?? [])
-          .map((_) => d3.min(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
-      ) ?? 0;
-      const yMax = d3.max(
-        sensors
-          .map((sensor) => this.chartData.day[sensor.id] ?? [])
-          .map((_) => d3.max(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
-      ) ?? 0;
+      const yMin =
+        d3.min(
+          sensors
+            .map((sensor) => this.chartData[sensor.id] ?? [])
+            .map((_) => d3.min(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
+        ) ?? 0;
+      const yMax =
+        d3.max(
+          sensors
+            .map((sensor) => this.chartData[sensor.id] ?? [])
+            .map((_) => d3.max(_?.radiation?.values ?? [], (_) => _.uSvphAvg))
+        ) ?? 0;
 
       const width = 100;
       const height = 100;
@@ -632,13 +572,8 @@ Module.register("MMM-FF-multigeiger", {
         );
         if (!listElement.node()) return;
 
-        const data = this.chartData.day[sensor.id]?.radiation?.values
-        // ?.map(
-        //   (_) => {
-        //     _._id = new Date(_._id);
-        //     return _;
-        //   }
-        // );
+        const data = this.chartData[sensor.id]?.radiation?.values;
+
         if (!data) return;
 
         listElement.select("svg").remove();

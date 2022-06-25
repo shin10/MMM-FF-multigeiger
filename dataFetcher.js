@@ -43,11 +43,7 @@ const DataFetcher = function (nodeHelper, config) {
   var __sensorDataListItemIdx = 0;
   var __avgs = null;
   var __avgsFiltered = null;
-  var __chartData = {
-    day: {},
-    week: {},
-    month: {}
-  };
+  var __chartData = {};
   var __minVals = {};
   var __maxVals = {};
   var __avg48Vals = {};
@@ -381,7 +377,7 @@ const DataFetcher = function (nodeHelper, config) {
         axios.spread((...responses) => {
           responses.forEach((response) => {
             const id = response.config.params.sensorid;
-            __chartData.day[id] = response.data;
+            __chartData[id] = response.data;
             getDayChartDataMinMaxAvg(id);
           });
         })
@@ -438,7 +434,7 @@ const DataFetcher = function (nodeHelper, config) {
         axios.spread((...responses) => {
           responses.forEach((response) => {
             const id = response.config.params.sensorid;
-            __chartData.day[id] = response.data;
+            __chartData[id] = response.data;
             getDayChartDataMinMaxAvg(id);
           });
         })
@@ -495,7 +491,7 @@ const DataFetcher = function (nodeHelper, config) {
         axios.spread((...responses) => {
           responses.forEach((response) => {
             const id = response.config.params.sensorid;
-            __chartData.day[id] = response.data;
+            __chartData[id] = response.data;
             getDayChartDataMinMaxAvg(id);
           });
         })
@@ -513,9 +509,9 @@ const DataFetcher = function (nodeHelper, config) {
     __avg48Vals[id] = {};
     __latestVals[id] = {};
 
-    let radiation = __chartData.day[id]?.radiation;
+    let radiation = __chartData[id]?.radiation;
     if (radiation?.values?.length) {
-      let values = __chartData.day[id].radiation.values;
+      let values = __chartData[id].radiation.values;
 
       // get min vals
       __minVals[id] = values.reduce((a, b) => {

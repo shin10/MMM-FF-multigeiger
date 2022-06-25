@@ -1,13 +1,5 @@
 ![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.gif)
 
-TODO:
-
-* ~Date "now" aktuell halten~ Stuttgart 80.6 Dresden 71.4
-* Time scale nach type
-* type change event
-* layout change event
-* README
-
 # MMM-FF-multigeiger (BETA)
 
 [![ISC License](https://img.shields.io/badge/license-ISC-blue.svg)](https://choosealicense.com/licenses/isc)
@@ -17,6 +9,12 @@ Want to help us? [Join the project and build your own Geiger-Müller counter!](h
 
 Features:
 
+- shows multiple sensors collections
+- multiple layouts
+- date ranges for 24 hours, week and month
+- shows min/max/average and current values
+- toggles between CPM and µSv
+- customizable colors
 - sequences
 - events for user interactions
 - supports multiple module instances
@@ -48,10 +46,10 @@ $(
   disabled: false,
   config: {
     layout: "list-horizontal",
-    style: "default", // or "monochrome", "color", ["#f00", "#0f0", "#00f" ...]
-    sequence: "default", // null, 'random', 'default', 'reverse'
-    updateOnSuspension: null, // null, false or true
-    updateInterval: 5 * 60 * 1000, // 5 minutes
+    style: "default",
+    sequence: "default",
+    updateOnSuspension: null,
+    updateInterval: 5 * 60 * 1000,
     showTitle: true,
     animationSpeed: 1000,
     toggleUnitInterval: 10 * 1000,
@@ -85,14 +83,18 @@ $(
       },
     ],
     events: {
-      sender: ["MMM-Touch", "module_0_MMM-GroveGestures"],
+      SENSOR_LIST_ITEM_RANDOM: "SENSOR_LIST_ITEM_RANDOM",
       SENSOR_LIST_ITEM_PREVIOUS: "SENSOR_LIST_ITEM_PREVIOUS",
       SENSOR_LIST_ITEM_NEXT: "SENSOR_LIST_ITEM_NEXT",
-      SENSOR_LIST_ITEM_RANDOM: "SENSOR_LIST_ITEM_RANDOM",
-      SENSOR_LIST_ITEM_NEXT: "SENSOR_LIST_ITEM_NEXT",
-      ARTICLE_PREVIOUS: "SENSOR_LIST_ITEM_PREVIOUS",
-      ARTICLE_RANDOM: "SENSOR_LIST_ITEM_RANDOM",
-      ARTICLE_NEXT: "SENSOR_LIST_ITEM_NEXT",
+
+      SENSOR_LIST_DATE_BACKWARDS: "SENSOR_LIST_DATE_BACKWARDS",
+      SENSOR_LIST_DATE_FORWARDS: "SENSOR_LIST_DATE_FORWARDS",
+      SENSOR_LIST_DATE_NOW: "SENSOR_LIST_DATE_NOW",
+      SENSOR_LIST_DATE_RANGE_ZOOM_IN: "SENSOR_LIST_DATE_RANGE_ZOOM_IN",
+      SENSOR_LIST_DATE_RANGE_ZOOM_OUT: "SENSOR_LIST_DATE_RANGE_ZOOM_OUT",
+
+      SENSOR_LIST_LAYOUT_PREVIOUS: "SENSOR_LIST_LAYOUT_PREVIOUS",
+      SENSOR_LIST_LAYOUT_NEXT: "SENSOR_LIST_LAYOUT_NEXT"
     }
   },
 },
@@ -100,20 +102,66 @@ $(
 
 ### Configuration Options
 
-| **Option**           | **Type**         | **Default**                            | **Description**                                                                             |
-| -------------------- | ---------------- | -------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `header`             | `string`         | `"Multigeiger"`                        | The module title.                                                                           |
-| `baseURL`            | `string`         | `"https://multigeiger.citysensor.de/"` | Basically that. Doesn't have to be changed.                                                 |
-| `updateInterval`     | `int`            | `600000` (10 minutes)                  | The duration of the update interval in ms or `null`.                                        |
-| `updateOnSuspension` | `bool`           | `null`                                 | `null`, `false` or `true`. Further explanations below.                                      |
-| `showTitle`          | `bool`           | `true`                                 | A boolean to show/hide the title.                                                           |
-| `animationSpeed`     | `int`            | `1000`                                 | The duration of the page transition.                                                        |
-| `events`             | `object`         |                                        | An object listing event constants to remap if necessary.                                    |
-| `events.sender`      | `string`/`array` | `null`                                 | If this is set, only events sent by the modules with this `name` or `id` will be processed. |
+#### General
+
+| **Option**           | **Type**         | **Default**                            | **Description**                                                                                                                                        |
+| -------------------- | ---------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `baseURL`            | `string`         | `"https://multigeiger.citysensor.de/"` | Basically that. Doesn't have to be changed.                                                                                                            |
+| `header`             | `string`         | `"Multigeiger"`                        | The module title.                                                                                                                                      |
+| `showTitle`          | `bool`           | `true`                                 | A boolean to show/hide the title.                                                                                                                      |
+| `sequence`           | `string`         | `default`                              | The order in which to loop through the items in the sensorList: `default`, `random` or `reverse`                                                       |
+| `updateInterval`     | `int`            | `900000` (15 minutes)                  | The duration of the update interval in ms or `null`.                                                                                                   |
+| `updateOnSuspension` | `bool`           | `null`                                 | `null`, `false` or `true`. Further explanations below.                                                                                                 |
+| `animationSpeed`     | `int`            | `1000`                                 | The duration of the page transition.                                                                                                                   |
+| `layout`             | `string`         | `list-horizontal`                      | Defines the layout as either `list-horizontal`, `list-vertical` or `charts`.                                                                           |
+| `type`               | `string`         | `day`                                  | Set's the amount of data shown to `day`, `week` or `month`.                                                                                            |
+| `chartColors`        | `string`/`array` | `default`                              | Color of the line charts: `default` (gradient), a single color string (`"#fff"`) or an array of color strings (`["#f00", "#0f0", "#00f"]`) for charts. |
+| `toggleUnitInterval` | `int`            | `10000` (10 seconds)                   | The amount of time showing values in CPM/µSv units before switching.                                                                                   |
+| `sensorList`         | `array`          | SensorListItem[]                       | An array with sensorList configurations.                                                                                                               |
+| `events`             | `object`         |                                        | An object listing event constants to remap if necessary.                                                                                               |
+| `events.sender`      | `string`/`array` | `null`                                 | If this is set, only events sent by the modules with this `name` or `id` will be processed.                                                            |
+
+#### SensorListItems
+
+_\*) optional_
+
+| **Option**             | **Type**         | **Default** | **Description**                                                       |
+| ---------------------- | ---------------- | ----------- | --------------------------------------------------------------------- |
+| `sensors`              | Sensor[]         | `undefined` | An array of objects with sensor `id` and `description` shown as list. |
+| `weight`\*             | `float`          | `1.0`       | A number to set the probability for random mode.                      |
+| `header`\*             | `string`         | `undefined` | Overrides the general `header`.                                       |
+| `showTitle`\*          | `bool`           | `undefined` | Overrides the general `showTitle`.                                    |
+| `layout`\*             | `string`         | `undefined` | Overrides the general `layout`.                                       |
+| `type`\*               | `string`         | `undefined` | Overrides the general `type`.                                         |
+| `chartColors`\*        | `string`/`array` | `undefined` | Overrides the general `chartColors`.                                  |
+| `toggleUnitInterval`\* | `int`            | `undefined` | Overrides the general `toggleUnitInterval`.                           |
+
+#### Sensor
+
+| **Option**    | **Type** | **Description**                                              |
+| ------------- | -------- | ------------------------------------------------------------ |
+| `id`          | `int`    | The sensors `id` given at https://multigeiger.citysensor.de/ |
+| `description` | `string` | The display name of the sensor.                              |
+
+### Layouts (`layoutType`)
+
+#### `charts`
+
+A multi line chart for a list of sensors.
+
+![Magic Mirror² displaying a multi line graph with radiation data of multigeiger devices](screenshot-charts.gif)
+
+#### `list-horizontal`/`list-vertical`
+
+Shows a list of sensors with (cropped) graphs related to each other.
+
+![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.gif)
 
 ### Sensor list items
 
-The items in the sensor list define the collection of sensors. Further you can override the config properties per sensorList item to switch `layout` or data amount (`type`). The `weight` property will be used if the `SENSOR_LIST_ITEM_RANDOM` event is dispatched, or sequence is set to `random`.
+The items in the sensor list define the collection of sensors. Further you can override the general config properties per sensorList item to switch `layout` or data amount (`type`).
+
+The `weight` property will be used if the `SENSOR_LIST_ITEM_RANDOM` event is dispatched, or sequence is set to `random`.
 
 ### `updateInterval` and `updateOnSuspension`
 
@@ -132,15 +180,27 @@ The following events are supported:
 - SENSOR_LIST_ITEM_PREVIOUS
 - SENSOR_LIST_ITEM_NEXT
 - SENSOR_LIST_ITEM_RANDOM
+
 - SENSOR_LIST_DATE_BACKWARDS
-- SENSOR_LIST_DATE_NOW
 - SENSOR_LIST_DATE_FORWARDS
+- SENSOR_LIST_DATE_NOW
 - SENSOR_LIST_DATE_RANGE_ZOOM_IN
 - SENSOR_LIST_DATE_RANGE_ZOOM_OUT
+
 - SENSOR_LIST_LAYOUT_PREVIOUS
 - SENSOR_LIST_LAYOUT_NEXT
 
-For ease of use they can be remapped in the `events` object to custom strings. Refer to the example config above.
+For ease of use they can be remapped in the `events` object to custom strings. Further you can add an array of `sender`s for filtering the dispatching modules.
+
+```js
+    events: {
+      sender: ["MMM-Touch", "MMM-GroveGestures"],
+      ARTICLE_RANDOM: "SENSOR_LIST_ITEM_RANDOM",
+      ARTICLE_PREVIOUS: "SENSOR_LIST_ITEM_PREVIOUS",
+      ARTICLE_NEXT: "SENSOR_LIST_ITEM_NEXT",
+      // ...
+    }
+```
 
 Events will be ignored if the module is currently hidden.
 

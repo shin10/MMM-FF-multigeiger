@@ -4,6 +4,7 @@
     "dayjs",
     "sensorid",
     "sensorname",
-    "Svph"
+    "Svph",
+    "vals"
   ]
 }

@@ -21,12 +21,11 @@
   "homepage": "https://github.com/shin10/MMM-FFmultigeiger#readme",
   "dependencies": {
     "axios": "^0.26.0",
-    "cheerio": "^1.0.0-rc.10",
     "d3": "^7.4.4",
     "dayjs": "^1.11.3"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-sass": "^5.1.0",
     "sass": "^1.51.0"
   }
