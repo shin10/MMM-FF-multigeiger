@@ -115,6 +115,7 @@ $(
 | `animationSpeed`     | `int`            | `1000`                                 | The duration of the page transition.                                                                                                                   |
 | `layout`             | `string`         | `list-horizontal`                      | Defines the layout as either `list-horizontal`, `list-vertical` or `charts`.                                                                           |
 | `type`               | `string`         | `day`                                  | Set's the amount of data shown to `day`, `week` or `month`.                                                                                            |
+| `avgTime`            | `int`            | `60`                                   | The amount of minutes for smoothing the radiation values.                                                                                              |
 | `chartColors`        | `string`/`array` | `default`                              | Color of the line charts: `default` (gradient), a single color string (`"#fff"`) or an array of color strings (`["#f00", "#0f0", "#00f"]`) for charts. |
 | `toggleUnitInterval` | `int`            | `10000` (10 seconds)                   | The amount of time showing values in CPM/µSv units before switching.                                                                                   |
 | `sensorList`         | `array`          | SensorListItem[]                       | An array with sensorList configurations.                                                                                                               |
@@ -133,6 +134,8 @@ _\*) optional_
 | `showTitle`\*          | `bool`           | `undefined` | Overrides the general `showTitle`.                                    |
 | `layout`\*             | `string`         | `undefined` | Overrides the general `layout`.                                       |
 | `type`\*               | `string`         | `undefined` | Overrides the general `type`.                                         |
+| `avgTime`\*            | `int`            | `undefined` | Overrides the general `avgTime`.                                      |
+| `longAVG`\*            | `int`            | `undefined` | Overrides the general `longAVG`.                                      |
 | `chartColors`\*        | `string`/`array` | `undefined` | Overrides the general `chartColors`.                                  |
 | `toggleUnitInterval`\* | `int`            | `undefined` | Overrides the general `toggleUnitInterval`.                           |
 

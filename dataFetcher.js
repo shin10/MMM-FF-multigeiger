@@ -21,6 +21,7 @@ const RANDOM = "random";
 const REVERSE = "reverse";
 const DEFAULT = "default";
 const DEFAULT_AVG_TIME = 60;
+const DEFAULT_LONG_AVG = 1;
 
 const DataFetcher = function (nodeHelper, config) {
   var {
@@ -355,7 +356,7 @@ const DataFetcher = function (nodeHelper, config) {
               DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? 1
+            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
           }
         })
       );
@@ -412,7 +413,7 @@ const DataFetcher = function (nodeHelper, config) {
               DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? 1
+            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
           }
         })
       );
@@ -469,7 +470,7 @@ const DataFetcher = function (nodeHelper, config) {
               DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? 48
+            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
           }
         })
       );
