@@ -1,6 +1,6 @@
 ![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.gif)
 
-# MMM-FF-multigeiger (BETA)
+# MMM-FF-multigeiger
 
 [![ISC License](https://img.shields.io/badge/license-ISC-blue.svg)](https://choosealicense.com/licenses/isc)
 
