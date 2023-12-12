@@ -1,4 +1,4 @@
-/* Magic Mirror
+/* MagicMirror²
  * Module: MMM-FF-multigeiger
  *
  * By Michael Trenkler
