@@ -1,14 +1,14 @@
 {
   "name": "magic-mirror-module-ff-multigeiger",
   "version": "1.0.0",
-  "description": "Module for Magic Mirror 2 featuring radiation data collected by the https://ecocurious.de/projekte/multigeiger-2/ project and accessed via https://multigeiger.citysensor.de/",
+  "description": "Module for MagicMirror² featuring radiation data collected by the https://ecocurious.de/projekte/multigeiger-2/ project and accessed via https://multigeiger.citysensor.de/.",
   "main": "MMM-FF-multigeiger.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shin10/MMM-FFmultigeiger.git"
   },
   "keywords": [
-    "Magic Mirror Module",
+    "magic mirror",
     "smart mirror",
     "radiation",
     "multigeiger"

@@ -1,6 +1,6 @@
-![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.gif)
-
 # MMM-FF-multigeiger
+
+![MagicMirror² displaying a radiation graph of a multigeiger](screenshot.gif)
 
 [![ISC License](https://img.shields.io/badge/license-ISC-blue.svg)](https://choosealicense.com/licenses/isc)
 
@@ -152,13 +152,13 @@ _\*) optional_
 
 A multi line chart for a list of sensors.
 
-![Magic Mirror² displaying a multi line graph with radiation data of multigeiger devices](screenshot-charts.gif)
+![MagicMirror² displaying a multi line graph with radiation data of multigeiger devices](screenshot-charts.gif)
 
 #### `list-horizontal`/`list-vertical`
 
 Shows a list of sensors with (cropped) graphs related to each other.
 
-![Magic Mirror² displaying a radiation graph of a multigeiger](screenshot.gif)
+![MagicMirror² displaying a radiation graph of a multigeiger](screenshot.gif)
 
 ### Sensor list items
 
