@@ -232,37 +232,42 @@ Module.register("MMM-FF-multigeiger", {
   toggleUnitIntervalFunction() {
     if (this.toggleUnitInterval) clearTimeout(this.toggleUnitInterval);
 
-    this.toggleUnitInterval = setTimeout(() => {
-      this.toggleUnitIntervalState = !this.toggleUnitIntervalState;
-      [
-        ...document
-          .getElementById(this.identifier)
-          .getElementsByClassName("sensorlist-current-cpm")
-      ].forEach((_) => _.classList.remove("show", "hide"));
-      [
-        ...document
-          .getElementById(this.identifier)
-          .getElementsByClassName("sensorlist-current-svt")
-      ].forEach((_) => _.classList.remove("show", "hide"));
-      window.requestAnimationFrame(() => {
+    this.toggleUnitInterval = setTimeout(
+      () => {
+        this.toggleUnitIntervalState = !this.toggleUnitIntervalState;
         [
           ...document
             .getElementById(this.identifier)
             .getElementsByClassName("sensorlist-current-cpm")
-        ].forEach((_) => {
-          _.classList.add(!this.toggleUnitIntervalState ? "show" : "hide");
-        });
+        ].forEach((_) => _.classList.remove("show", "hide"));
         [
           ...document
             .getElementById(this.identifier)
             .getElementsByClassName("sensorlist-current-svt")
-        ].forEach((_) => {
-          _.classList.add(this.toggleUnitIntervalState ? "show" : "hide");
+        ].forEach((_) => _.classList.remove("show", "hide"));
+        window.requestAnimationFrame(() => {
+          [
+            ...document
+              .getElementById(this.identifier)
+              .getElementsByClassName("sensorlist-current-cpm")
+          ].forEach((_) => {
+            _.classList.add(!this.toggleUnitIntervalState ? "show" : "hide");
+          });
+          [
+            ...document
+              .getElementById(this.identifier)
+              .getElementsByClassName("sensorlist-current-svt")
+          ].forEach((_) => {
+            _.classList.add(this.toggleUnitIntervalState ? "show" : "hide");
+          });
         });
-      });
 
-      this.toggleUnitIntervalFunction();
-    }, this.sensorListConfig.toggleUnitInterval ?? this.config.toggleUnitInterval ?? 3000);
+        this.toggleUnitIntervalFunction();
+      },
+      this.sensorListConfig.toggleUnitInterval ??
+        this.config.toggleUnitInterval ??
+        3000
+    );
   },
 
   renderSensorData(layout) {
@@ -419,18 +424,18 @@ Module.register("MMM-FF-multigeiger", {
           d3.timeSecond(date) < date
             ? formatMillisecond
             : d3.timeMinute(date) < date
-            ? formatSecond
-            : d3.timeHour(date) < date
-            ? formatMinute
-            : d3.timeDay(date) < date
-            ? formatHour
-            : d3.timeMonth(date) < date
-            ? d3.timeWeek(date) < date
-              ? formatDay
-              : formatWeek
-            : d3.timeYear(date) < date
-            ? formatMonth
-            : formatYear
+              ? formatSecond
+              : d3.timeHour(date) < date
+                ? formatMinute
+                : d3.timeDay(date) < date
+                  ? formatHour
+                  : d3.timeMonth(date) < date
+                    ? d3.timeWeek(date) < date
+                      ? formatDay
+                      : formatWeek
+                    : d3.timeYear(date) < date
+                      ? formatMonth
+                      : formatYear
         )(date);
       }
 

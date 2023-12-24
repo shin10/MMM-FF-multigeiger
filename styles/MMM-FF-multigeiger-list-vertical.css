@@ -35,7 +35,8 @@
 }
 .MMM-FF-multigeiger .list-vertical .sensorlist-item svg {
   opacity: 0;
-  animation: svg-fade-in 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
+  animation: svg-fade-in 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1
+    forwards;
   animation-delay: inherit;
   width: 200px;
   height: 5rem;
@@ -197,5 +198,6 @@
 .region.right .MMM-FF-multigeiger .list-vertical .graph-wrapper {
   width: 0;
   opacity: 0;
-  animation: graph-wrapper-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1 forwards;
+  animation: graph-wrapper-scale 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 1
+    forwards;
 }

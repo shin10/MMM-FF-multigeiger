@@ -25,11 +25,10 @@ Features:
 Navigate to the `modules` directory of your MagicMirror² installation and clone this repository.
 
 ```sh
-git clone https://github.com/shin10/MMM-FF-multigeiger.git
-$(
-  cd MMM-FF-multigeiger &&
-  npm i
-)
+cd ~/MagicMirror/modules
+git clone https://github.com/shin10/MMM-FF-multigeiger
+cd MMM-FF-multigeiger
+npm i
 ```
 
 ## Configuration

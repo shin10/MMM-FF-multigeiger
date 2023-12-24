@@ -1,21 +1,23 @@
 {
-  "extends": [
-    "eslint:recommended",
-    "plugin:prettier/recommended",
-    "plugin:jsdoc/recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "env": {
+    "browser": true,
+    "es2023": true,
+    "node": true
+  },
+  "root": true,
   "globals": {
     "Module": true,
     "Log": true,
     "MM": true,
-    "d3": true,
+    "d3": true
   },
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2022
+    "ecmaVersion": 2023
   },
   "rules": {
-    "no-tabs": 2,
+    "no-unused-vars": "warn",
     "prettier/prettier": [
       "error",
       {
