@@ -356,7 +356,8 @@ const DataFetcher = function (nodeHelper, config) {
               DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
+            longAVG:
+              __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
           }
         })
       );
@@ -413,7 +414,8 @@ const DataFetcher = function (nodeHelper, config) {
               DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
+            longAVG:
+              __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
           }
         })
       );
@@ -470,7 +472,8 @@ const DataFetcher = function (nodeHelper, config) {
               DEFAULT_AVG_TIME,
             live: true,
             moving: true,
-            longAVG: __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
+            longAVG:
+              __sensorDataListItem.longAVG ?? config.longAVG ?? DEFAULT_LONG_AVG
           }
         })
       );
